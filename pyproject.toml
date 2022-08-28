@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "bla-bot"
+version = "0.1.0"
+description = ""
+authors = ["dilshan-h <77499497+Dilshan-H@users.noreply.github.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+python-telegram-bot = {version = "20.0a2", allow-prereleases = true}
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+pylint = "^2.14.5"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
