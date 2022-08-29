@@ -24,7 +24,7 @@ except ImportError:
 
 if __version_info__ < (20, 0, 0, "alpha", 1):
     raise RuntimeError(
-        "This bot is compatible with python-telegram-bot v20.0a2 or higher."
+        "This bot is only compatible with python-telegram-bot v20.0a2 or higher."
     )
 
 
@@ -48,6 +48,8 @@ from telegram.ext import (
     ConversationHandler,
 )
 
+from gpa_values import get_gpa
+
 # Enable logging
 logging.basicConfig(
     # filename="app.log",
@@ -69,9 +71,7 @@ Also, reporting bugs is always appreciated and pull requests are always welcome!
 
 
 # Choices Data
-USER_ID, USER_NAME = range(2)
-
-APPROVED_USERS = ["29", "30", "31"]
+USER_ID, USER_NIC = range(2)
 
 
 def extract_status_change(
@@ -256,7 +256,11 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 async def gpa(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     """Stores the info about the user and ends the conversation."""
     # user = update.message.from_user
-    await update.message.reply_text("Please enter your admission number")
+    await update.message.reply_text(
+        "Okay... Let's see how much you have scored! 🔥\n"
+        "Please enter your UoM admission number:\n\n"
+        "If you want to cancel this conversation anytime, just type /cancel."
+    )
     logger.info("/gpa - Getting user's ID")
     return USER_ID
 
@@ -264,37 +268,97 @@ async def gpa(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
 async def get_id(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     """Stores the info about the user and ends the conversation."""
     # user = update.message.from_user
-    if validate_id(update.message.text):
-        await update.message.reply_text("Please enter your last name")
-        logger.info("/gpa - Getting user's last name")
-        return USER_NAME
+    if get_gpa(update.message.text, 1) != []:
+        await update.message.reply_text("Please enter your NIC number")
+        logger.info("/gpa - Getting user's NIC")
+        return USER_NIC
     else:
-        await update.message.reply_text("Invalid ID detected! - Terminating process")
-        await update.message.reply_text("Check your ID and try again with command /gpa")
+        await update.message.reply_text(
+            "Invalid ID detected! - Terminating process...\n"
+            "Check your ID and try again with command /gpa"
+        )
+
         return ConversationHandler.END
 
 
-async def get_name(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+async def get_nic(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     """Stores the info about the user and ends the conversation."""
     user = update.message.from_user
-    logger.info("Last name of %s: %s", user.first_name, update.message.text)
-    await update.message.reply_text("Give me some time...")
+    logger.info("Received NIC from %s: %s", user.first_name, update.message.text)
 
-    await update.message.reply_text(calculate_gpa(update.message.text, USER_ID))
+    await update.message.reply_text(
+        calculate_gpa(update.message.text), parse_mode=ParseMode.HTML
+    )
 
     return ConversationHandler.END
 
 
-def calculate_gpa(last_name: str, user_id: str):
+def calculate_gpa(user_nic: str) -> str:
     """Stores the info about the user and ends the conversation."""
-    logger.info("Calculating GPA for %s", last_name)
-    return "4.0"
+    logger.info("Calculating GPA for %s", user_nic)
+    results = get_gpa(user_nic, 2)
+    message_body: str = ""
+    warnings: str = ""
 
+    if results == []:
+        return "Invalid NIC detected! - Sorry, You are not authorized to continue..."
+    if results[10]:
+        return (
+            "I can't validate your NIC because it's not registered in database.\n"
+            "Please mention admin to update your NIC"
+        )
 
-def validate_id(user_id: str):
-    """Stores the info about the user and ends the conversation."""
-    logger.info("Validating ID for %s", user_id)
-    return bool(user_id in APPROVED_USERS)
+    count: int = 1
+    # Semester GPAs
+    for item in results[2:10]:
+        if item in ["", "\n"]:
+            count += 1
+            continue
+        sgpa: float = round(float(item), 2)
+        if sgpa < 1.50:
+            warnings += (
+                f"🔴 Semester {count} GPA: <b>{sgpa}</b> - <b>Academic Probation</b>\n"
+            )
+        if sgpa < 2.00:
+            warnings += (
+                f"🔴 Semester {count} GPA: <b>{sgpa}</b> - <b>Academic Warning</b>\n"
+            )
+        message_body += f"Semester {count} GPA: <b>{sgpa}</b>\n"
+        count += 1
+    message_body += "\n"
+
+    # Level GPAs
+    for item in results[11:15]:
+        if item in ["", "\n"]:
+            count += 1
+            continue
+        message_body += f"Level {count} GPA: <b>{round(float(item), 2)}</b>\n"
+        count += 1
+    message_body += "\n"
+
+    # Current GPA
+    cgpa: float = round(float(results[15]), 2)
+    message_body += f"Your Current GPA: <b>{cgpa}</b>\n\n"
+
+    # Academic Status
+    if cgpa >= 3.70:
+        message_body += (
+            "Congrats! 🎉✨ You currently have a First Class 🔥🔥🔥 - Keep it up!"
+        )
+    elif cgpa >= 3.30:
+        message_body += (
+            "Congrats! 🎉✨ You currently have a Second Class Upper 🔥🔥 - Keep it up!"
+        )
+    elif cgpa >= 3.30:
+        message_body += (
+            "Congrats! 🎉✨ You currently have a Second Class Lower 🔥🔥 - Keep it up!"
+        )
+    elif cgpa >= 2.00:
+        message_body += "Pass! ✨ - Keep it up! - You can achieve a class! 🔥"
+    else:
+        message_body += "GPA is less than 2.0 😢 - or did I make any mistake?"
+
+    return message_body
 
 
 async def cancel_conversation(
@@ -303,7 +367,7 @@ async def cancel_conversation(
     """Cancels and ends the conversation."""
     user = update.message.from_user
     logger.info("User %s canceled the conversation.", user.first_name)
-    await update.message.reply_text("Bye! I hope we can talk again some day.")
+    await update.message.reply_text("OK, Your request has been cancelled")
 
     return ConversationHandler.END
 
@@ -345,11 +409,10 @@ def main() -> None:
         entry_points=[CommandHandler("gpa", gpa)],
         states={
             USER_ID: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_id)],
-            USER_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_name)],
+            USER_NIC: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_nic)],
         },
         fallbacks=[CommandHandler("cancel", cancel_conversation)],
     )
-
     application.add_handler(conv_handler)
 
     # Handle unknown commands.
