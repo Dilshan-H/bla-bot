@@ -10,6 +10,8 @@ bot.
 """
 
 import logging
+import traceback
+import json
 import os
 from typing import Optional, Tuple
 from uuid import uuid4
@@ -48,7 +50,7 @@ from telegram.ext import (
     ConversationHandler,
 )
 
-from gpa_values import get_gpa
+from gpa_values import calculate_gpa, get_gpa
 
 # Enable logging
 logging.basicConfig(
@@ -266,23 +268,26 @@ async def gpa(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
 
 
 async def get_id(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
-    """Stores the info about the user and ends the conversation."""
+    """Get the user's ID and run validation. Then request NIC info."""
     # user = update.message.from_user
     if get_gpa(update.message.text, 1) != []:
         await update.message.reply_text("Please enter your NIC number")
         logger.info("/gpa - Getting user's NIC")
         return USER_NIC
-    else:
-        await update.message.reply_text(
-            "Invalid ID detected! - Terminating process...\n"
-            "Check your ID and try again with command /gpa"
-        )
 
-        return ConversationHandler.END
+    await update.message.reply_text(
+        "Invalid ID detected! - Terminating process...\n"
+        "Check your ID and try again with command /gpa"
+    )
+
+    return ConversationHandler.END
 
 
 async def get_nic(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
-    """Stores the info about the user and ends the conversation."""
+    """
+    Get the user's NIC and call calculate_gpa function. Then return the GPA info
+    and end the conversation.
+    """
     user = update.message.from_user
     logger.info("Received NIC from %s: %s", user.first_name, update.message.text)
 
@@ -293,81 +298,13 @@ async def get_nic(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     return ConversationHandler.END
 
 
-def calculate_gpa(user_nic: str) -> str:
-    """Stores the info about the user and ends the conversation."""
-    logger.info("Calculating GPA for %s", user_nic)
-    results = get_gpa(user_nic, 2)
-    message_body: str = ""
-    warnings: str = ""
-
-    if results == []:
-        return "Invalid NIC detected! - Sorry, You are not authorized to continue..."
-    if results[10]:
-        return (
-            "I can't validate your NIC because it's not registered in database.\n"
-            "Please mention admin to update your NIC"
-        )
-
-    count: int = 1
-    # Semester GPAs
-    for item in results[2:10]:
-        if item in ["", "\n"]:
-            count += 1
-            continue
-        sgpa: float = round(float(item), 2)
-        if sgpa < 1.50:
-            warnings += (
-                f"🔴 Semester {count} GPA: <b>{sgpa}</b> - <b>Academic Probation</b>\n"
-            )
-        if sgpa < 2.00:
-            warnings += (
-                f"🔴 Semester {count} GPA: <b>{sgpa}</b> - <b>Academic Warning</b>\n"
-            )
-        message_body += f"Semester {count} GPA: <b>{sgpa}</b>\n"
-        count += 1
-    message_body += "\n"
-
-    # Level GPAs
-    for item in results[11:15]:
-        if item in ["", "\n"]:
-            count += 1
-            continue
-        message_body += f"Level {count} GPA: <b>{round(float(item), 2)}</b>\n"
-        count += 1
-    message_body += "\n"
-
-    # Current GPA
-    cgpa: float = round(float(results[15]), 2)
-    message_body += f"Your Current GPA: <b>{cgpa}</b>\n\n"
-
-    # Academic Status
-    if cgpa >= 3.70:
-        message_body += (
-            "Congrats! 🎉✨ You currently have a First Class 🔥🔥🔥 - Keep it up!"
-        )
-    elif cgpa >= 3.30:
-        message_body += (
-            "Congrats! 🎉✨ You currently have a Second Class Upper 🔥🔥 - Keep it up!"
-        )
-    elif cgpa >= 3.30:
-        message_body += (
-            "Congrats! 🎉✨ You currently have a Second Class Lower 🔥🔥 - Keep it up!"
-        )
-    elif cgpa >= 2.00:
-        message_body += "Pass! ✨ - Keep it up! - You can achieve a class! 🔥"
-    else:
-        message_body += "GPA is less than 2.0 😢 - or did I make any mistake?"
-
-    return message_body
-
-
 async def cancel_conversation(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ) -> int:
     """Cancels and ends the conversation."""
     user = update.message.from_user
     logger.info("User %s canceled the conversation.", user.first_name)
-    await update.message.reply_text("OK, Your request has been cancelled")
+    await update.message.reply_text("✅ OK, Your request has been cancelled")
 
     return ConversationHandler.END
 
@@ -377,6 +314,37 @@ async def unknown_commands(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     logger.warning("Unknown command received: %s", update.message.text)
     await update.message.reply_text(
         "Sorry, I didn't understand that command 🤖\nTry /help to see what I can do."
+    )
+
+
+async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Log the error and send a telegram message to notify the developer."""
+    logger.error(msg="Exception while handling an update")
+
+    tb_list = traceback.format_exception(
+        None, context.error, context.error.__traceback__, 0
+    )
+    tb_string = "".join(tb_list)
+
+    update_str = update.to_dict() if isinstance(update, Update) else str(update)
+
+    message = (
+        f"🔴 <b><u>{BOT_NAME} - Error Report</u></b>\n\n"
+        "An exception was raised while handling an update\n\n"
+        f"<pre>update = {escape(json.dumps(update_str, indent=2, ensure_ascii=False))}"
+        "</pre>\n\n"
+        f"<pre>context.chat_data = {escape(str(context.chat_data))}</pre>\n\n"
+        f"<pre>context.user_data = {escape(str(context.user_data))}</pre>\n\n"
+        f"⏩ <pre>{escape(tb_string)}</pre>"
+    )
+
+    await update.message.reply_text(
+        "Oops! Something's wrong 🤖\n"
+        "An error occurred while handling your request.\n"
+        "The error has been reported to the developer and will be fixed soon.\n"
+    )
+    await context.bot.send_message(
+        chat_id=os.environ["DEV_CHAT_ID"], text=message, parse_mode=ParseMode.HTML
     )
 
 
@@ -421,6 +389,9 @@ def main() -> None:
 
     # Handle inline queries.
     application.add_handler(InlineQueryHandler(inline_query))
+
+    # Handle errors.
+    application.add_error_handler(error_handler)
 
     # Run the bot until the user presses Ctrl-C
     # Pass 'allowed_updates' handle *all* updates including `chat_member` updates
