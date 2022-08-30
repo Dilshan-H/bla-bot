@@ -12,6 +12,7 @@ Author: @dilshan-h (https://github.com/dilshan-h)
 import os
 from typing import List
 import csv
+from random import choice
 from functools import lru_cache
 
 BASE_DIR: str = os.path.dirname(os.path.abspath(__file__))
@@ -46,7 +47,7 @@ def calculate_gpa(user_nic: str) -> str:
     if results[10]:
         return (
             "I can't validate your NIC because it's not registered in database.\n"
-            "Please mention admin to update your NIC"
+            "Please mention/ping admin to update your NIC"
         )
 
     # Semester GPAs
@@ -61,7 +62,7 @@ def calculate_gpa(user_nic: str) -> str:
             warnings += (
                 f"🔴 Semester {count} GPA: <b>{sgpa}</b> - <b>Academic Probation</b>\n"
             )
-        if sgpa < 2.00:
+        elif sgpa < 2.00:
             warnings += (
                 f"🔴 Semester {count} GPA: <b>{sgpa}</b> - <b>Academic Warning</b>\n"
             )
@@ -102,18 +103,35 @@ def calculate_gpa(user_nic: str) -> str:
 def academic_status(cgpa: float) -> str:
     """Construct the academic status message based on cgpa value"""
     status_msg: str = ""
+    greetings: List[str] = [
+        "Cheers!",
+        "Yay!",
+        "Cool!",
+        "Awesome!",
+    ]
+    greeting: str = choice(greetings)
+    spoiler: str = "<span class='tg-spoiler'>"
+
     if cgpa >= 3.70:
-        status_msg += "Congrats! 🎉✨🚀 You currently have a First Class 🔥🔥🔥 - Keep it up!"
-    elif cgpa >= 3.30:
         status_msg += (
-            "Congrats! 🎉✨ You currently have a Second Class Upper 🔥🔥 - Keep it up!"
+            f"{greeting} 🎉✨ You currently have a "
+            f"{spoiler}First Class 🔥🔥\nKeep it up!</span>"
         )
     elif cgpa >= 3.30:
         status_msg += (
-            "Congrats! 🎉✨ You currently have a Second Class Lower 🔥🔥 - Keep it up!"
+            f"{greeting} 🎉✨ You currently have a "
+            f"{spoiler}Second Class Upper 🔥🔥\nKeep it up!</span>"
+        )
+    elif cgpa >= 3.00:
+        status_msg += (
+            f"{greeting} 🎉✨ You currently have a "
+            f"{spoiler}Second Class Lower 🔥🔥\nKeep it up!</span>"
         )
     elif cgpa >= 2.00:
-        status_msg += "Pass! ✨ - Keep it up! - You can achieve a class! 🔥"
+        status_msg += (
+            f"{greeting} 🎉✨ You have a "
+            f"{spoiler}pass... \nKeep it up! ✨ - You can achieve a class!</span>"
+        )
     else:
         status_msg += "GPA is less than 2.0 😢 - or did I make any mistake?"
 
