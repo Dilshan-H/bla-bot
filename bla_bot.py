@@ -13,8 +13,7 @@ import logging
 import traceback
 import json
 import os
-from typing import Optional, Tuple
-from uuid import uuid4
+from typing import Optional, Tuple, Union
 from html import escape
 
 from telegram import __version__ as TG_VER
@@ -35,8 +34,6 @@ from telegram import (
     ChatMember,
     ChatMemberUpdated,
     Update,
-    InlineQueryResultArticle,
-    InputTextMessageContent,
 )
 from telegram.constants import ParseMode
 from telegram.ext import (
@@ -46,11 +43,12 @@ from telegram.ext import (
     CommandHandler,
     MessageHandler,
     filters,
-    InlineQueryHandler,
     ConversationHandler,
 )
 
 from gpa_values import calculate_gpa, get_gpa
+from staff_info import employee_info
+from about_user import user_info
 
 # Enable logging
 logging.basicConfig(
@@ -71,9 +69,10 @@ So you can see inside me literally! - How I handle all your requests...\n
 Btw If you want, you can copy my source code and make your own bot under MIT license.\n
 Also, reporting bugs is always appreciated and pull requests are always welcome! 🤗\n"""
 
-
 # Choices Data
 USER_ID, USER_NIC = range(2)
+QUERY_STAFF = range(1)
+QUERY_USER = range(1)
 
 
 def extract_status_change(
@@ -181,16 +180,14 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         "/help - 👀 Show this message"
         "\n"
         "/about - ⭐ Read about me"
-        "\n"
-        "/version - 📝 Show the version of the bot"
         "\n\n"
         "<b><u>Academic Related</u></b>"
         "\n\n"
         "/gpa - 📊 Show your GPA data"
         "\n"
-        "/uom - 🎓 About UoM"
+        "/staff - 👥 Get Staff Info"
         "\n"
-        "/staff - 👥 Get Staff Info",
+        "/uom - 🎓 About UoM",
         parse_mode=ParseMode.HTML,
     )
 
@@ -223,43 +220,11 @@ async def about_uom(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     )
 
 
-async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handle the inline query. This is run when you type: @botusername <query>"""
-    query = update.inline_query.query
-
-    if query == "":
-        return
-
-    results = [
-        InlineQueryResultArticle(
-            id=str(uuid4()),
-            title="Capitalize Text",
-            input_message_content=InputTextMessageContent(query.upper()),
-        ),
-        InlineQueryResultArticle(
-            id=str(uuid4()),
-            title="Bold Text",
-            input_message_content=InputTextMessageContent(
-                f"<b>{escape(query)}</b>", parse_mode=ParseMode.HTML
-            ),
-        ),
-        InlineQueryResultArticle(
-            id=str(uuid4()),
-            title="Italic Text",
-            input_message_content=InputTextMessageContent(
-                f"<i>{escape(query)}</i>", parse_mode=ParseMode.HTML
-            ),
-        ),
-    ]
-
-    await update.inline_query.answer(results)
-
-
 async def gpa(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     """Stores the info about the user and ends the conversation."""
     # user = update.message.from_user
     await update.message.reply_text(
-        "Okay... Let's see how much you have scored! 🔥\n"
+        "Okay... Let's see how much you have scored! 🔥😋\n"
         "Please enter your UoM admission number:\n\n"
         "If you want to cancel this conversation anytime, just type /cancel."
     )
@@ -267,7 +232,7 @@ async def gpa(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     return USER_ID
 
 
-async def get_id(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+async def get_id(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Union[str, int]:
     """Get the user's ID and run validation. Then request NIC info."""
     # user = update.message.from_user
     if get_gpa(update.message.text, 1) != []:
@@ -283,7 +248,7 @@ async def get_id(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     return ConversationHandler.END
 
 
-async def get_nic(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+async def get_nic(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """
     Get the user's NIC and call calculate_gpa function. Then return the GPA info
     and end the conversation.
@@ -293,6 +258,51 @@ async def get_nic(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
 
     await update.message.reply_text(
         calculate_gpa(update.message.text), parse_mode=ParseMode.HTML
+    )
+
+    return ConversationHandler.END
+
+
+async def staff(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Get user's search query"""
+    await update.message.reply_text(
+        "Okay... Let's see who you are looking for! 🧐\n"
+        "Please enter your search query (Part of a name, Post, Phone...):\n\n"
+        "If you want to cancel this conversation, just type /cancel."
+    )
+    return QUERY_STAFF
+
+
+async def get_staff_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """Return info about a staff member based on user's query."""
+    await update.message.reply_text(
+        employee_info(update.message.text), parse_mode=ParseMode.HTML
+    )
+
+    return ConversationHandler.END
+
+
+async def whois(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Show information about a specific user."""
+    await update.message.reply_text(
+        "Okay... Let's see who you are looking for! 🧐\n"
+        "Please enter your search query (Part of a name, email, Phone...):\n\n"
+        "If you want to cancel this conversation, just type /cancel.",
+        parse_mode=ParseMode.HTML,
+    )
+    return QUERY_USER
+
+
+async def get_user_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """Return info about a user based on user's query."""
+    user = update.message.from_user
+    logger.info(
+        "WhoIs Info requested by: %s - Request: %s",
+        user.first_name,
+        update.message.text,
+    )
+    await update.message.reply_text(
+        user_info(update.message.text), parse_mode=ParseMode.HTML
     )
 
     return ConversationHandler.END
@@ -372,8 +382,8 @@ def main() -> None:
     application.add_handler(CommandHandler("uom", about_uom))
     logger.info("About UOM handler added")
 
-    # Handle conversation.
-    conv_handler = ConversationHandler(
+    # Handle conversation - GPA Info
+    gpa_conv_handler = ConversationHandler(
         entry_points=[CommandHandler("gpa", gpa)],
         states={
             USER_ID: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_id)],
@@ -381,14 +391,35 @@ def main() -> None:
         },
         fallbacks=[CommandHandler("cancel", cancel_conversation)],
     )
-    application.add_handler(conv_handler)
+    application.add_handler(gpa_conv_handler)
+
+    # Handle conversation - Staff Info
+    staff_conv_handler = ConversationHandler(
+        entry_points=[CommandHandler("staff", staff)],
+        states={
+            QUERY_STAFF: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, get_staff_info)
+            ],
+        },
+        fallbacks=[CommandHandler("cancel", cancel_conversation)],
+    )
+    application.add_handler(staff_conv_handler)
+
+    # Handle conversation - User Info
+    user_conv_handler = ConversationHandler(
+        entry_points=[CommandHandler("whois", whois)],
+        states={
+            QUERY_USER: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, get_user_info)
+            ],
+        },
+        fallbacks=[CommandHandler("cancel", cancel_conversation)],
+    )
+    application.add_handler(user_conv_handler)
 
     # Handle unknown commands.
     application.add_handler(MessageHandler(filters.COMMAND, unknown_commands))
     logger.info("Unknown Command handler added")
-
-    # Handle inline queries.
-    application.add_handler(InlineQueryHandler(inline_query))
 
     # Handle errors.
     application.add_error_handler(error_handler)
