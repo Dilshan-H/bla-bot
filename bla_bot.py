@@ -13,8 +13,10 @@ import logging
 import traceback
 import json
 import os
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Union, List
 from html import escape
+from datetime import time
+import pytz
 
 from telegram import __version__ as TG_VER
 
@@ -49,6 +51,7 @@ from telegram.ext import (
 from gpa_values import calculate_gpa, get_gpa
 from staff_info import employee_info
 from about_user import user_info
+from manage_bdays import generate_wish
 
 # Enable logging
 logging.basicConfig(
@@ -73,6 +76,9 @@ Also, reporting bugs is always appreciated and pull requests are always welcome!
 USER_ID, USER_NIC = range(2)
 QUERY_STAFF = range(1)
 QUERY_USER = range(1)
+
+# Timezone Data
+TIME_ZONE: str = "Asia/Colombo"
 
 
 def extract_status_change(
@@ -166,6 +172,68 @@ async def greet_chat_members(
             f"{member_name} is no longer with us... See you soon {member_name}! 🙌",
             parse_mode=ParseMode.HTML,
         )
+
+
+async def check_bdays(context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Send birthday wishes for users"""
+    job = context.job
+    bday_wishes: List[str] = generate_wish()
+
+    for wish in bday_wishes:
+        await context.bot.send_message(
+            chat_id=job.chat_id, text=wish, parse_mode=ParseMode.HTML
+        )
+
+
+def remove_task_if_exists(name: str, context: ContextTypes.DEFAULT_TYPE) -> bool:
+    """Remove task with given name. Returns whether task was removed."""
+    current_tasks = context.job_queue.get_jobs_by_name(name)
+
+    if not current_tasks:
+        return False
+    for task in current_tasks:
+        task.schedule_removal()
+
+    return True
+
+
+async def manage_scheduled_tasks(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
+    """Manage Scheduled tasks"""
+    chat_id = update.effective_message.chat_id
+    user_id = update.effective_user.id
+
+    if str(user_id) != os.environ["DEV_CHAT_ID"]:
+        await update.message.reply_text(
+            "Sorry, You are not authorized to use this command."
+        )
+        return
+    try:
+        state = context.args[0].lower()
+    except IndexError:
+        await update.message.reply_text("You have to specify a state. [on/off]")
+        return
+    start_time = time(16, 54, 45, tzinfo=pytz.timezone("Asia/Colombo"))
+
+    if state == "on":
+        remove_task_if_exists(str(chat_id), context)
+        context.job_queue.run_daily(
+            check_bdays, start_time, chat_id=chat_id, name=str(chat_id), data=state
+        )
+        await update.message.reply_text("Scheduled tasks are now enabled!")
+    elif state == "off":
+        job_removed = remove_task_if_exists(str(chat_id), context)
+        text = (
+            "Scheduled tasks are now disabled!"
+            if job_removed
+            else "No active scheduled tasks!"
+        )
+        await update.message.reply_text(text)
+
+    else:
+        await update.message.reply_text("Invalid state! [on/off supported]")
+        return
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -332,7 +400,7 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
     logger.error(msg="Exception while handling an update")
 
     tb_list = traceback.format_exception(
-        None, context.error, context.error.__traceback__, 0
+        None, context.error, context.error.__traceback__, 5
     )
     tb_string = "".join(tb_list)
 
@@ -369,6 +437,10 @@ def main() -> None:
         ChatMemberHandler(greet_chat_members, ChatMemberHandler.CHAT_MEMBER)
     )
     logger.info("Greeting handler added")
+
+    # Handle scheduled tasks.
+    application.add_handler(CommandHandler("tasks", manage_scheduled_tasks))
+    logger.info("Scheduled tasks handler added")
 
     # Handle '/help' command.
     application.add_handler(CommandHandler("help", help_command))
