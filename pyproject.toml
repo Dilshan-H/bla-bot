@@ -7,6 +7,7 @@ authors = ["dilshan-h <77499497+Dilshan-H@users.noreply.github.com>"]
 [tool.poetry.dependencies]
 python = "^3.8"
 python-telegram-bot = {version = "20.0a2", allow-prereleases = true}
+pytz = "^2022.2.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
