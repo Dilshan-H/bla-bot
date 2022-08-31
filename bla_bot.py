@@ -64,6 +64,7 @@ from about_user import user_info
 from manage_bdays import generate_wish
 
 # Enable logging
+# You can also enable logging to file - Just uncomment below lines
 logging.basicConfig(
     # filename="app.log",
     # filemode="w",
@@ -210,7 +211,7 @@ async def greet_chat_members(
 
 
 async def check_bdays(context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Send birthday wishes for users"""
+    """Check for birthdays and send wishes for users"""
     job = context.job
     bday_wishes: List[str] = generate_wish()
 
@@ -298,7 +299,11 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         "\n"
         "/staff - 👥 Get Staff Info"
         "\n"
-        f"/{UNI_NAME_SHORT.lower()} - 🎓 About {UNI_NAME_SHORT}",
+        f"/{UNI_NAME_SHORT.lower()} - 🎓 About {UNI_NAME_SHORT}"
+        "\n\n"
+        "<b><u>Other</u></b>"
+        "\n\n"
+        "/tasks - 🕒 Manage scheduled tasks",
         parse_mode=ParseMode.HTML,
     )
 
@@ -311,7 +316,9 @@ async def about_bot(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "\n"
         f"{BOT_DESCRIPTION}"
         "\n\n"
-        "Made with ❤️ by <a href='https://github.com/dilshan-h'>@Dilshan-h</a>",
+        "Made with ❤️ by <a href='https://github.com/dilshan-h'>@Dilshan-h</a>"
+        "\n\n"
+        "Review my source code <a href='https://github.com/dilshan-h'>@GitHub</a>",
         parse_mode=ParseMode.HTML,
     )
 
@@ -373,7 +380,7 @@ async def get_nic(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     return ConversationHandler.END
 
 
-async def staff(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def staff(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     """Get user's search query"""
     await update.message.reply_text(
         "Okay... Let's see who you are looking for! 🧐\n"
@@ -392,7 +399,7 @@ async def get_staff_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     return ConversationHandler.END
 
 
-async def whois(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def whois(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Union[None, str]:
     """Show information about a specific user."""
     if not authenticate_origin(update):
         await update.message.reply_text(
@@ -428,7 +435,7 @@ async def get_user_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
 async def cancel_conversation(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ) -> int:
-    """Cancels and ends the conversation."""
+    """Cancels and ends the active conversation."""
     user = update.message.from_user
     logger.info("User %s canceled the conversation.", user.first_name)
     await update.message.reply_text("✅ OK, Your request has been cancelled")
