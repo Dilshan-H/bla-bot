@@ -472,13 +472,13 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
         f"⏩ <pre>{escape(tb_string)}</pre>"
     )
 
+    await context.bot.send_message(
+        chat_id=DEV_CHAT_ID, text=message, parse_mode=ParseMode.HTML
+    )
     await update.message.reply_text(
         "Oops! Something's wrong 🤖\n"
         "An error occurred while handling your request.\n"
         "The error has been reported to the developer and will be fixed soon.\n"
-    )
-    await context.bot.send_message(
-        chat_id=DEV_CHAT_ID, text=message, parse_mode=ParseMode.HTML
     )
 
 
