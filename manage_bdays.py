@@ -1,3 +1,81 @@
-def get_birthdays(csv_file):
-    """Check for users' birthdays from csv file and send a message if they are today."""
-    return None
+"""
+Get birthdays for a specific date from a CSV file and return wishes for each user with a random text
+
+Functions:
+    get_birthdays() -> List[str]
+
+Author: @dilshan-h (https://github.com/dilshan-h)
+"""
+
+import os
+from typing import List
+import csv
+from datetime import datetime
+from random import choice
+import pytz
+
+BASE_DIR: str = os.path.dirname(os.path.abspath(__file__))
+data_path: str = os.path.join(BASE_DIR, "DATA", "full_batch_data.csv")
+TIME_ZONE: str = "Asia/Colombo"
+
+WISHES: List[str] = [
+    "May this birthday be just the beginning of a year filled with wonderful moments...",
+    "May the years continue to be good to you...",
+    "May this year be the best of your life...",
+    "May each and every passing year bring you wisdom, peace and cheer...",
+    "Wishing you a wonderful day and fabulous year...",
+    "Smile! It's your birthday...",
+    "Best wishes for a happy day filled with laughter and love...",
+    "Wishing you great happiness and a joy that never ends...",
+    "Many happy returns of the day...",
+    "Wishing you another wonderful year of happiness and joy...",
+    "May this year be your best ever!",
+    "Here's to celebrating you!",
+    "May this day bring to you all things that make you smile...",
+    "Life is a journey, so enjoy every mile...",
+    "Count your life by smiles, not tears; Count your age by friends, not years...",
+]
+
+
+def get_birthdays() -> List[str]:
+    """Check for users' birthdays"""
+    now = datetime.now().astimezone(pytz.timezone(TIME_ZONE))
+    names: List[str] = []
+    with open(file=data_path, mode="r", encoding="utf-8") as data_file:
+        reader = csv.reader(data_file)
+        for row in reader:
+            try:
+                current_bday = datetime.strptime(row[2], "%Y-%m-%d")
+                tmp_date = current_bday.replace(
+                    year=now.year,
+                    hour=now.hour,
+                    minute=now.minute,
+                    second=now.second,
+                    microsecond=now.microsecond,
+                ).astimezone(pytz.timezone(TIME_ZONE))
+                if now == tmp_date:
+                    names.append(row[9])
+            except ValueError:
+                continue
+    return names
+
+
+def generate_wish() -> List[str]:
+    """Get a random wish and construct the message body"""
+    bday_wishes: List[str] = []
+    names: List[str] = get_birthdays()
+    if not names:
+        return []
+
+    for name in names:
+        bday_wishes.append(
+            "🎉🎉🎉🎉🎊🎈🎂🎈🎊🎉🎉🎉🎉"
+            "\n\n"
+            f"<b>{choice(WISHES)}</b>"
+            "\n"
+            f"ℍ𝔸ℙℙ𝕐 𝔹𝕀ℝ𝕋ℍ𝔻𝔸𝕐 {name}!"
+            "\n\n"
+            "🎉🎉🎉🎉🎊🎈🎂🎈🎊🎉🎉🎉🎉"
+        )
+
+    return bday_wishes
