@@ -40,7 +40,7 @@ def user_info(query: str) -> str:
             )
         for info in found_info:
             message_body += (
-                "<b>👤 <u>About</u></b>"
+                f"<b>👤 <u>About {info[9]}</u></b>"
                 "\n\n"
                 f"🔹<b>ID:</b> {info[0]}\n"
                 f"🔹<b>Name:</b> {info[1]}\n"
