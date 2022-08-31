@@ -5,8 +5,18 @@
 
 """
 Usage:
-Press Ctrl-C on the command line or send a signal to the process to stop the
-bot.
+- Make sure to install the dependencies first and configure the BOT INFO, CHAT/TELEGRAM INFO,
+TIMEZONE DATA and UNIVERSITY INFO.
+- The data files must be formatted as requested.
+- Following environment variables are used to configure the bot.
+    TELEGRAM_TOKEN -> Telegram bot token.
+    DEV_CHAT_ID -> The chat id of the developer where the bot will send debug messages.
+    GROUP_CHAT_ID -> The chat id of your group.
+
+Press Ctrl-C on the command line to stop the bot.
+
+Project Name: BLA-20 Bot
+Author: @dilshan-h (https://github.com/dilshan-h)
 """
 
 import logging
@@ -64,7 +74,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # BOT INFO
-BOT_VERSION: str = "0.1.0"
+BOT_VERSION: str = "1.6.0"
 BOT_NAME: str = "TEMP BOT"
 BOT_DESCRIPTION: str = """Born on: 2022.08.20 in Sri Lanka.\n
 And, Hey, I'm an open-source bot written in Python.
@@ -72,13 +82,38 @@ So you can see inside me literally! - How I handle all your requests...\n
 Btw If you want, you can copy my source code and make your own bot under MIT license.\n
 Also, reporting bugs is always appreciated and pull requests are always welcome! 🤗\n"""
 
-# Choices Data
+# CHAT/TELEGRAM INFO
+TELEGRAM_TOKEN: str = os.environ["TELEGRAM_TOKEN"]
+DEV_CHAT_ID: str = os.environ["DEV_CHAT_ID"]
+GROUP_CHAT_ID: str = os.environ["GROUP_CHAT_ID"]
+
+# TIMEZONE DATA
+TIME_ZONE: str = "Asia/Colombo"
+
+# UNIVERSITY INFO
+UNI_NAME_LONG: str = "University of Moratuwa"
+UNI_NAME_SHORT: str = "UoM"
+UNI_DESCRIPTION: str = (
+    "University of Moratuwa, a leading technological university in the region "
+    "welcomes you to witness a truly unique experience!\n"
+    "Read More <a href='https://uom.lk/about-the-university'>here.</a>\n\n"
+    "<b>📞 General Numbers:</b> 0112640051, 0112650301\n\n"
+    "<b>📠 General Fax:</b> +94112650622\n\n"
+    "<b>📨 Email:</b> info@uom.lk\n\n"
+    "<b>🏬 Address:</b> University of Moratuwa, Bandaranayake Mawatha, Moratuwa 10400\n"
+)
+
+# CHOICES DATA
 USER_ID, USER_NIC = range(2)
 QUERY_STAFF = range(1)
 QUERY_USER = range(1)
 
-# Timezone Data
-TIME_ZONE: str = "Asia/Colombo"
+
+def authenticate_origin(update: Update) -> bool:
+    """
+    Checks if the update originated from the group chat.
+    """
+    return str(update.message.chat.id) == GROUP_CHAT_ID
 
 
 def extract_status_change(
@@ -206,7 +241,15 @@ async def manage_scheduled_tasks(
 
     if str(user_id) != os.environ["DEV_CHAT_ID"]:
         await update.message.reply_text(
-            "Sorry, You are not authorized to use this command."
+            "⛔ Sorry, You are not authorized to use this command."
+        )
+        return
+    if not authenticate_origin(update):
+        # Prevent accidental usage by developers
+        await update.message.reply_text(
+            "⛔ Request Rejected! - This command requires elevated privileges.\n"
+            "Reason: Originated from unrecognized chat id.\n\n"
+            "Please visit https://github.com/dilshan-h/bla-bot to make your own bot."
         )
         return
     try:
@@ -214,32 +257,32 @@ async def manage_scheduled_tasks(
     except IndexError:
         await update.message.reply_text("You have to specify a state. [on/off]")
         return
-    start_time = time(16, 54, 45, tzinfo=pytz.timezone("Asia/Colombo"))
+    start_time = time(0, 0, 0, tzinfo=pytz.timezone(TIME_ZONE))
 
     if state == "on":
         remove_task_if_exists(str(chat_id), context)
         context.job_queue.run_daily(
             check_bdays, start_time, chat_id=chat_id, name=str(chat_id), data=state
         )
-        await update.message.reply_text("Scheduled tasks are now enabled!")
+        await update.message.reply_text("✅ Scheduled tasks are now enabled!")
     elif state == "off":
         job_removed = remove_task_if_exists(str(chat_id), context)
         text = (
-            "Scheduled tasks are now disabled!"
+            "❎ Scheduled tasks are now disabled!"
             if job_removed
-            else "No active scheduled tasks!"
+            else "🚫 No active scheduled tasks!"
         )
         await update.message.reply_text(text)
 
     else:
-        await update.message.reply_text("Invalid state! [on/off supported]")
+        await update.message.reply_text("🚫 Invalid state! [on/off supported]")
         return
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Show 'About' section for the bot when the command /help is issued."""
+    """Show 'Help' section for the bot when the command /help is issued."""
     await update.message.reply_text(
-        "<b>Hello there! 👋 I'm TEMP BOT and I'm here for you <i>24x7</i> no matter what 😊</b>"
+        f"<b>Hello there! 👋 I'm {BOT_NAME} and I'm here for you <i>24x7</i> no matter what 😊</b>"
         "\n\n"
         "<b><u>Basic Commands</u></b>"
         "\n\n"
@@ -255,7 +298,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         "\n"
         "/staff - 👥 Get Staff Info"
         "\n"
-        "/uom - 🎓 About UoM",
+        f"/{UNI_NAME_SHORT.lower()} - 🎓 About {UNI_NAME_SHORT}",
         parse_mode=ParseMode.HTML,
     )
 
@@ -273,27 +316,27 @@ async def about_bot(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     )
 
 
-async def about_uom(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Show BOT_VERSION & info when the command /about is issued."""
-    logger.info("About UoM requested")
+async def about_university(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Show university info when the command /{UNI_NAME_SHORT} is issued."""
+    logger.info("About University Info requested")
     await update.message.reply_text(
-        "University of Moratuwa, a leading technological university in the region "
-        "welcomes you to witness a truly unique experience!\n"
-        "Read More <a href='https://uom.lk/about-the-university'>here.</a>\n\n"
-        "<b>📞 General Numbers:</b> 0112640051, 0112650301\n\n"
-        "<b>📠 General Fax:</b> +94112650622\n\n"
-        "<b>📨 Email:</b> info@uom.lk\n\n"
-        "<b>🏬 Address:</b> University of Moratuwa, Bandaranayake Mawatha, Moratuwa 10400\n",
+        UNI_DESCRIPTION,
         parse_mode=ParseMode.HTML,
     )
 
 
 async def gpa(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
-    """Stores the info about the user and ends the conversation."""
-    # user = update.message.from_user
+    """Initiate /gpa conversation & get user's University ID"""
+    if not authenticate_origin(update):
+        await update.message.reply_text(
+            "⛔ Request Rejected! - This command requires elevated privileges.\n"
+            "Reason: Originated from unrecognized chat id.\n\n"
+            "Please visit https://github.com/dilshan-h/bla-bot to make your own bot."
+        )
+        return
     await update.message.reply_text(
         "Okay... Let's see how much you have scored! 🔥😋\n"
-        "Please enter your UoM admission number:\n\n"
+        f"Please enter your {UNI_NAME_SHORT} admission number:\n\n"
         "If you want to cancel this conversation anytime, just type /cancel."
     )
     logger.info("/gpa - Getting user's ID")
@@ -301,8 +344,7 @@ async def gpa(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
 
 
 async def get_id(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Union[str, int]:
-    """Get the user's ID and run validation. Then request NIC info."""
-    # user = update.message.from_user
+    """Run validation on User ID & then request NIC info."""
     if get_gpa(update.message.text, 1) != []:
         await update.message.reply_text("Please enter your NIC number")
         logger.info("/gpa - Getting user's NIC")
@@ -352,6 +394,13 @@ async def get_staff_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
 async def whois(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Show information about a specific user."""
+    if not authenticate_origin(update):
+        await update.message.reply_text(
+            "⛔ Request Rejected! - This command requires elevated privileges.\n"
+            "Reason: Originated from unrecognized chat id.\n\n"
+            "Please visit https://github.com/dilshan-h/bla-bot to make your own bot."
+        )
+        return
     await update.message.reply_text(
         "Okay... Let's see who you are looking for! 🧐\n"
         "Please enter your search query (Part of a name, email, Phone...):\n\n"
@@ -397,7 +446,7 @@ async def unknown_commands(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Log the error and send a telegram message to notify the developer."""
-    logger.error(msg="Exception while handling an update")
+    logger.error("Exception while handling an update")
 
     tb_list = traceback.format_exception(
         None, context.error, context.error.__traceback__, 5
@@ -422,7 +471,7 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
         "The error has been reported to the developer and will be fixed soon.\n"
     )
     await context.bot.send_message(
-        chat_id=os.environ["DEV_CHAT_ID"], text=message, parse_mode=ParseMode.HTML
+        chat_id=DEV_CHAT_ID, text=message, parse_mode=ParseMode.HTML
     )
 
 
@@ -430,7 +479,7 @@ def main() -> None:
     """Start the bot."""
     # Create the Application and pass it your bot's token.
     # Use environment variables to avoid hardcoding your bot's token.
-    application = Application.builder().token(os.environ["TELEGRAM_TOKEN"]).build()
+    application = Application.builder().token(TELEGRAM_TOKEN).build()
 
     # Handle members joining/leaving chats.
     application.add_handler(
@@ -450,9 +499,9 @@ def main() -> None:
     application.add_handler(CommandHandler("about", about_bot))
     logger.info("About handler added")
 
-    # Handle '/uom' command.
-    application.add_handler(CommandHandler("uom", about_uom))
-    logger.info("About UOM handler added")
+    # Handle '/{UNI_NAME_SHORT}' command.
+    application.add_handler(CommandHandler(UNI_NAME_SHORT.lower(), about_university))
+    logger.info("About University handler added")
 
     # Handle conversation - GPA Info
     gpa_conv_handler = ConversationHandler(
