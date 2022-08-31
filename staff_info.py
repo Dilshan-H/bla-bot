@@ -1,4 +1,11 @@
-"""Provide information about an specific employee"""
+"""
+Provide information about an specific employee based on the user's query
+
+Functions:
+    employee_info(query: str) -> str
+
+Author: @dilshan-h (https://github.com/dilshan-h)
+"""
 
 import os
 from functools import lru_cache

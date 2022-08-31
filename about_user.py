@@ -1,4 +1,12 @@
-"""Show information about a specific user"""
+"""
+Show information about a specific user based on the user's query
+
+Functions:
+    user_info(query: str) -> str
+    calculate_lucky_no(birthday: str) -> str
+
+Author: @dilshan-h (https://github.com/dilshan-h)
+"""
 
 from functools import lru_cache
 import os
@@ -56,9 +64,9 @@ def user_info(query: str) -> str:
     return message_body
 
 
-def calculate_lucky_no(birthday: str) -> int:
+def calculate_lucky_no(birthday: str) -> str:
     """Calculate the lucky number of a user based on his/her birthday"""
     lucky_no = sum(map(int, birthday.replace("-", "")))
     if lucky_no > 9:
         return calculate_lucky_no(str(lucky_no))
-    return lucky_no
+    return str(lucky_no)
