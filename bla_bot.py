@@ -110,11 +110,15 @@ QUERY_STAFF = range(1)
 QUERY_USER = range(1)
 
 
-def authenticate_origin(update: Update) -> bool:
+def is_authenticated_origin(update: Update) -> bool:
     """
     Checks if the update originated from the group chat.
     """
-    return str(update.message.chat.id) == GROUP_CHAT_ID
+    logger.info("Authentication request originated from ID: %s", update.message.chat.id)
+    return (
+        str(update.message.chat.id) == GROUP_CHAT_ID
+        or str(update.message.chat.id) == DEV_CHAT_ID
+    )
 
 
 def extract_status_change(
@@ -148,6 +152,36 @@ def extract_status_change(
     return was_member, is_member
 
 
+async def alert_dev(message: str, alert_type: int, context: ContextTypes) -> None:
+    """
+    Send updates, errors to the developer.
+    Alert Types:
+        0 -> Error
+        1 -> Update
+        2 -> Warning
+    """
+    logger.info("Sending new update to developer - Type: %s", alert_type)
+    if alert_type == 0:
+        await context.bot.send_message(
+            chat_id=DEV_CHAT_ID,
+            text=(f"🔴 <b><u>{BOT_NAME} - Error Report</u></b>\n\n" f"{message}"),
+            parse_mode=ParseMode.HTML,
+        )
+        return
+    if alert_type == 1:
+        await context.bot.send_message(
+            chat_id=DEV_CHAT_ID,
+            text=(f"🔵 <b><u>{BOT_NAME} -  New Update</u></b>\n\n" f"{message}"),
+            parse_mode=ParseMode.HTML,
+        )
+        return
+    await context.bot.send_message(
+        chat_id=DEV_CHAT_ID,
+        text=(f"⏺ <b><u>{BOT_NAME} -  Warning</u></b>\n\n" f"{message}"),
+        parse_mode=ParseMode.HTML,
+    )
+
+
 async def track_chats(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Tracks the chats the bot is in."""
     result = extract_status_change(update.my_chat_member)
@@ -164,25 +198,45 @@ async def track_chats(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         if not was_member and is_member:
             logger.info("%s started the bot", cause_name)
             context.bot_data.setdefault("user_ids", set()).add(chat.id)
+            await alert_dev(f"{cause_name} has started {BOT_NAME}", 1, context)
         elif was_member and not is_member:
             logger.info("%s blocked the bot", cause_name)
             context.bot_data.setdefault("user_ids", set()).discard(chat.id)
+            await alert_dev(f"{cause_name} has blocked {BOT_NAME}", 1, context)
     elif chat.type in [Chat.GROUP, Chat.SUPERGROUP]:
         if not was_member and is_member:
             logger.info("%s added the bot to the group %s", cause_name, chat.title)
             context.bot_data.setdefault("group_ids", set()).add(chat.id)
+            await alert_dev(
+                f"{cause_name} has added {BOT_NAME} to group - {chat.title}", 1, context
+            )
         elif was_member and not is_member:
             logger.info("%s removed the bot from the group %s", cause_name, chat.title)
             context.bot_data.setdefault("group_ids", set()).discard(chat.id)
+            await alert_dev(
+                f"{cause_name} has removed {BOT_NAME} from group - {chat.title}",
+                1,
+                context,
+            )
     else:
         if not was_member and is_member:
             logger.info("%s added the bot to the channel %s", cause_name, chat.title)
             context.bot_data.setdefault("channel_ids", set()).add(chat.id)
+            await alert_dev(
+                f"{cause_name} has added {BOT_NAME} to channel - {chat.title}",
+                1,
+                context,
+            )
         elif was_member and not is_member:
             logger.info(
                 "%s removed the bot from the channel %s", cause_name, chat.title
             )
             context.bot_data.setdefault("channel_ids", set()).discard(chat.id)
+            await alert_dev(
+                f"{cause_name} has removed {BOT_NAME} from channel - {chat.title}",
+                1,
+                context,
+            )
 
 
 async def greet_chat_members(
@@ -212,6 +266,7 @@ async def greet_chat_members(
 
 async def check_bdays(context: ContextTypes.DEFAULT_TYPE) -> None:
     """Check for birthdays and send wishes for users"""
+    logger.info("Checking for birthdays")
     job = context.job
     bday_wishes: List[str] = generate_wish()
 
@@ -241,21 +296,35 @@ async def manage_scheduled_tasks(
     user_id = update.effective_user.id
 
     if str(user_id) != os.environ["DEV_CHAT_ID"]:
+        logger.warning(
+            "Unauthorized user - %s tried to manage scheduled tasks", user_id
+        )
         await update.message.reply_text(
-            "⛔ Sorry, You are not authorized to use this command."
+            "⛔ Sorry, You are not authorized to use this command.\n"
+            "❓ Reason: This command requires elevated privileges."
         )
         return
-    if not authenticate_origin(update):
+    if not is_authenticated_origin(update):
         # Prevent accidental usage by developers
+        logger.warning(
+            "Unauthorized origin - %s tried to manage scheduled tasks", user_id
+        )
         await update.message.reply_text(
-            "⛔ Request Rejected! - This command requires elevated privileges.\n"
-            "Reason: Originated from unrecognized chat id.\n\n"
+            "⛔ Request Rejected! - This chat is unregistered.\n"
+            "❓ Reason: Originated from unrecognized chat id.\n\n"
             "Please visit https://github.com/dilshan-h/bla-bot to make your own bot."
+        )
+        await alert_dev(
+            f"An attempt was made to handle scheduled tasks in an unregistered chat\n"
+            f"Chat ID - {chat_id}",
+            2,
+            context,
         )
         return
     try:
         state = context.args[0].lower()
     except IndexError:
+        logger.warning("No state provided to manage scheduled tasks")
         await update.message.reply_text("You have to specify a state. [on/off]")
         return
     start_time = time(0, 0, 0, tzinfo=pytz.timezone(TIME_ZONE))
@@ -276,12 +345,14 @@ async def manage_scheduled_tasks(
         await update.message.reply_text(text)
 
     else:
+        logger.warning("Invalid state provided to manage scheduled tasks")
         await update.message.reply_text("🚫 Invalid state! [on/off supported]")
         return
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Show 'Help' section for the bot when the command /help is issued."""
+    logger.info("/help command issued by %s", update.effective_user.full_name)
     await update.message.reply_text(
         f"<b>Hello there! 👋 I'm {BOT_NAME} and I'm here for you <i>24x7</i> no matter what 😊</b>"
         "\n\n"
@@ -310,7 +381,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 async def about_bot(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Show BOT_VERSION & info when the command /about is issued."""
-    logger.info("BOT info requested")
+    logger.info("/about command issued by %s", update.effective_user.full_name)
     await update.message.reply_text(
         f"I'm {BOT_NAME} - Version {BOT_VERSION} 🤩"
         "\n"
@@ -325,7 +396,11 @@ async def about_bot(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def about_university(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Show university info when the command /{UNI_NAME_SHORT} is issued."""
-    logger.info("About University Info requested")
+    logger.info(
+        "/%s command issued by %s",
+        UNI_NAME_SHORT.lower(),
+        update.effective_user.full_name,
+    )
     await update.message.reply_text(
         UNI_DESCRIPTION,
         parse_mode=ParseMode.HTML,
@@ -334,11 +409,21 @@ async def about_university(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 
 async def gpa(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     """Initiate /gpa conversation & get user's University ID"""
-    if not authenticate_origin(update):
+    logger.info("/gpa command issued by %s", update.effective_user.full_name)
+    if not is_authenticated_origin(update):
+        logger.warning(
+            "Unauthorized user - %s tried to use command /gpa",
+            update.effective_user.full_name,
+        )
         await update.message.reply_text(
             "⛔ Request Rejected! - This command requires elevated privileges.\n"
-            "Reason: Originated from unrecognized chat id.\n\n"
+            "❓ Reason: Originated from unrecognized chat id.\n\n"
             "Please visit https://github.com/dilshan-h/bla-bot to make your own bot."
+        )
+        await alert_dev(
+            f"Unauthorized user - {update.effective_user.full_name} tried to use command /gpa",
+            2,
+            context,
         )
         return
     await update.message.reply_text(
@@ -357,6 +442,7 @@ async def get_id(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Union[st
         logger.info("/gpa - Getting user's NIC")
         return USER_NIC
 
+    logger.warning("/gpa - User's ID is invalid")
     await update.message.reply_text(
         "Invalid ID detected! - Terminating process...\n"
         "Check your ID and try again with command /gpa"
@@ -370,8 +456,7 @@ async def get_nic(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     Get the user's NIC and call calculate_gpa function. Then return the GPA info
     and end the conversation.
     """
-    user = update.message.from_user
-    logger.info("Received NIC from %s: %s", user.first_name, update.message.text)
+    logger.info("Received NIC from user: %s", update.message.text)
 
     await update.message.reply_text(
         calculate_gpa(update.message.text), parse_mode=ParseMode.HTML
@@ -382,6 +467,8 @@ async def get_nic(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 async def staff(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     """Get user's search query"""
+    logger.info("/staff command issued by %s", update.effective_user.full_name)
+    logger.info("/staff - Getting user's search query")
     await update.message.reply_text(
         "Okay... Let's see who you are looking for! 🧐\n"
         "Please enter your search query (Part of a name, Post, Phone...):\n\n"
@@ -392,6 +479,7 @@ async def staff(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
 
 async def get_staff_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Return info about a staff member based on user's query."""
+    logger.info("Received query from user: %s", update.message.text)
     await update.message.reply_text(
         employee_info(update.message.text), parse_mode=ParseMode.HTML
     )
@@ -401,13 +489,24 @@ async def get_staff_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
 async def whois(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Union[None, str]:
     """Show information about a specific user."""
-    if not authenticate_origin(update):
+    logger.info("/whois command issued by %s", update.effective_user.full_name)
+    if not is_authenticated_origin(update):
+        logger.warning(
+            "Unauthorized user - %s tried to use command /whois",
+            update.effective_user.full_name,
+        )
         await update.message.reply_text(
             "⛔ Request Rejected! - This command requires elevated privileges.\n"
-            "Reason: Originated from unrecognized chat id.\n\n"
+            "❓ Reason: Originated from unrecognized chat id.\n\n"
             "Please visit https://github.com/dilshan-h/bla-bot to make your own bot."
         )
+        await alert_dev(
+            f"Unauthorized user - {update.effective_user.full_name} tried to use command /whois",
+            2,
+            context,
+        )
         return
+    logger.info("/whois - Getting user's search query")
     await update.message.reply_text(
         "Okay... Let's see who you are looking for! 🧐\n"
         "Please enter your search query (Part of a name, email, Phone...):\n\n"
@@ -419,12 +518,7 @@ async def whois(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Union[Non
 
 async def get_user_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Return info about a user based on user's query."""
-    user = update.message.from_user
-    logger.info(
-        "WhoIs Info requested by: %s - Request: %s",
-        user.first_name,
-        update.message.text,
-    )
+    logger.info("Received query from user: %s", update.message.text)
     await update.message.reply_text(
         user_info(update.message.text), parse_mode=ParseMode.HTML
     )
@@ -436,8 +530,7 @@ async def cancel_conversation(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ) -> int:
     """Cancels and ends the active conversation."""
-    user = update.message.from_user
-    logger.info("User %s canceled the conversation.", user.first_name)
+    logger.info("/cancel command issued by %s", update.effective_user.full_name)
     await update.message.reply_text("✅ OK, Your request has been cancelled")
 
     return ConversationHandler.END
@@ -445,7 +538,11 @@ async def cancel_conversation(
 
 async def unknown_commands(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Reply to unknown commands."""
-    logger.warning("Unknown command received: %s", update.message.text)
+    logger.warning(
+        "Unknown command issued by %s | Command: %s",
+        update.effective_user.full_name,
+        update.message.text,
+    )
     await update.message.reply_text(
         "Sorry, I didn't understand that command 🤖\nTry /help to see what I can do."
     )
@@ -453,7 +550,9 @@ async def unknown_commands(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Log the error and send a telegram message to notify the developer."""
-    logger.error("Exception while handling an update")
+    logger.error(
+        "Exception while handling an update - Sending error message to developer"
+    )
 
     tb_list = traceback.format_exception(
         None, context.error, context.error.__traceback__, 5
@@ -463,7 +562,6 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
     update_str = update.to_dict() if isinstance(update, Update) else str(update)
 
     message = (
-        f"🔴 <b><u>{BOT_NAME} - Error Report</u></b>\n\n"
         "An exception was raised while handling an update\n\n"
         f"<pre>update = {escape(json.dumps(update_str, indent=2, ensure_ascii=False))}"
         "</pre>\n\n"
@@ -472,9 +570,8 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
         f"⏩ <pre>{escape(tb_string)}</pre>"
     )
 
-    await context.bot.send_message(
-        chat_id=DEV_CHAT_ID, text=message, parse_mode=ParseMode.HTML
-    )
+    await alert_dev(message, 0, context)
+
     await update.message.reply_text(
         "Oops! Something's wrong 🤖\n"
         "An error occurred while handling your request.\n"
@@ -504,7 +601,7 @@ def main() -> None:
 
     # Handle '/about' command.
     application.add_handler(CommandHandler("about", about_bot))
-    logger.info("About handler added")
+    logger.info("About Bot handler added")
 
     # Handle '/{UNI_NAME_SHORT}' command.
     application.add_handler(CommandHandler(UNI_NAME_SHORT.lower(), about_university))
@@ -520,6 +617,7 @@ def main() -> None:
         fallbacks=[CommandHandler("cancel", cancel_conversation)],
     )
     application.add_handler(gpa_conv_handler)
+    logger.info("GPA Info conversation handler added")
 
     # Handle conversation - Staff Info
     staff_conv_handler = ConversationHandler(
@@ -532,6 +630,7 @@ def main() -> None:
         fallbacks=[CommandHandler("cancel", cancel_conversation)],
     )
     application.add_handler(staff_conv_handler)
+    logger.info("Staff Info conversation handler added")
 
     # Handle conversation - User Info
     user_conv_handler = ConversationHandler(
@@ -544,6 +643,7 @@ def main() -> None:
         fallbacks=[CommandHandler("cancel", cancel_conversation)],
     )
     application.add_handler(user_conv_handler)
+    logger.info("User Info conversation handler added")
 
     # Handle unknown commands.
     application.add_handler(MessageHandler(filters.COMMAND, unknown_commands))
@@ -551,6 +651,7 @@ def main() -> None:
 
     # Handle errors.
     application.add_error_handler(error_handler)
+    logger.info("Error handler added")
 
     # Run the bot until the user presses Ctrl-C
     # Pass 'allowed_updates' handle *all* updates including `chat_member` updates
