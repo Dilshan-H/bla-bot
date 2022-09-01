@@ -11,18 +11,22 @@ Author: @dilshan-h (https://github.com/dilshan-h)
 from functools import lru_cache
 import os
 import csv
+from cryptography.fernet import Fernet
 
 BASE_DIR: str = os.path.dirname(os.path.abspath(__file__))
-data_path: str = os.path.join(BASE_DIR, "DATA", "full_batch_data.csv")
+data_path: str = os.path.join(BASE_DIR, "DATA", "full_batch_data.csv.crypt")
+fernet = Fernet(os.environ["SECRET_KEY"])
 
 
-@lru_cache
+@lru_cache(maxsize=16)
 def user_info(query: str) -> str:
     """Get all users info and return the message body including requested info"""
     message_body: str = "<b>🔎 Here's what I have found:</b>\n\n"
     found_info: list = []
-    with open(file=data_path, mode="r", encoding="utf-8") as data_file:
-        reader = csv.reader(data_file)
+    with open(file=data_path, mode="rb") as data_file:
+        stream = data_file.read()
+        decrypted_data = fernet.decrypt(stream).decode().strip().split("\n")
+        reader = csv.reader(decrypted_data)
         for row in reader:
             for item in row:
                 if query.lower() in item.lower():

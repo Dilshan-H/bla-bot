@@ -15,16 +15,21 @@ from typing import List
 import csv
 from random import choice
 from functools import lru_cache
+from cryptography.fernet import Fernet
+
 
 BASE_DIR: str = os.path.dirname(os.path.abspath(__file__))
-data_path: str = os.path.join(BASE_DIR, "DATA", "results.csv")
+data_path: str = os.path.join(BASE_DIR, "DATA", "results.csv.crypt")
+fernet = Fernet(os.environ["SECRET_KEY"])
 
 
-@lru_cache()
+@lru_cache(maxsize=16)
 def get_gpa(user_id: str, step: int) -> List[str]:
     """Get GPA data from results.csv for a specific user"""
-    with open(file=data_path, mode="r", encoding="utf-8") as data_file:
-        reader = csv.reader(data_file)
+    with open(file=data_path, mode="rb") as data_file:
+        stream = data_file.read()
+        decrypted_data = fernet.decrypt(stream).decode().strip().split("\n")
+        reader = csv.reader(decrypted_data)
         for row in reader:
             if step == 1:
                 if row[0].lower() == user_id.lower():
@@ -36,7 +41,7 @@ def get_gpa(user_id: str, step: int) -> List[str]:
     return []
 
 
-@lru_cache()
+@lru_cache(maxsize=16)
 def calculate_gpa(user_nic: str) -> str:
     """Construct and return reply-message body with GPA values"""
     results = get_gpa(user_nic, 2)
@@ -100,7 +105,6 @@ def calculate_gpa(user_nic: str) -> str:
     return message_body
 
 
-@lru_cache()
 def academic_status(cgpa: float) -> str:
     """Construct the academic status message based on cgpa value"""
     status_msg: str = ""

@@ -9,19 +9,23 @@ Author: @dilshan-h (https://github.com/dilshan-h)
 
 import os
 from functools import lru_cache
+from cryptography.fernet import Fernet
 
 BASE_DIR: str = os.path.dirname(os.path.abspath(__file__))
-data_path: str = os.path.join(BASE_DIR, "DATA", "staff_info.txt")
+data_path: str = os.path.join(BASE_DIR, "DATA", "staff_info.txt.crypt")
+fernet = Fernet(os.environ["SECRET_KEY"])
 
 
-@lru_cache
+@lru_cache(maxsize=16)
 def employee_info(query: str) -> str:
     """Construct info and return message body text"""
     found_info: list = []
     message_body: str = "<b>🔎 Here's what I have found:</b>\n\n"
 
-    with open(file=data_path, mode="r", encoding="utf-8") as data_file:
-        employees: list = data_file.read().split("\n\n")
+    with open(file=data_path, mode="rb") as data_file:
+        stream = data_file.read()
+        decrypted_data = fernet.decrypt(stream).decode().strip()
+        employees: list = decrypted_data.split("\n\n")
         for employee in employees:
             if query.lower() in employee.lower():
                 found_info.append(employee)
