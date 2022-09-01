@@ -75,7 +75,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # BOT INFO
-BOT_VERSION: str = "1.6.0"
+BOT_VERSION: str = "1.7.1"
 BOT_NAME: str = "TEMP BOT"
 BOT_DESCRIPTION: str = """Born on: 2022.08.20 in Sri Lanka.\n
 And, Hey, I'm an open-source bot written in Python.
