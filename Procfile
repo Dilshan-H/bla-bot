@@ -1,0 +1,1 @@
+web: python3 bla_bot.py

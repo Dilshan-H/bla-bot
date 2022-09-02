@@ -5,13 +5,18 @@
 
 """
 Usage:
-- Make sure to install the dependencies first and configure the BOT INFO, CHAT/TELEGRAM INFO,
-TIMEZONE DATA and UNIVERSITY INFO.
-- The data files must be formatted as requested.
-- Following environment variables are used to configure the bot.
-    TELEGRAM_TOKEN -> Telegram bot token.
-    DEV_CHAT_ID -> The chat id of the developer where the bot will send debug messages.
-    GROUP_CHAT_ID -> The chat id of your group.
+    - Make sure to install the dependencies first and configure the BOT INFO, CHAT/TELEGRAM INFO,
+    TIMEZONE DATA and UNIVERSITY INFO.
+    - If you're willing to deploy in Heroku Platform, make sure to configure the HEROKU INFO.
+    - The data files (in '/DATA' directory) must be formatted as requested.
+    - Following environment variables are used to configure the bot in LOCAL ENVIRONMENT.
+        TELEGRAM_TOKEN -> Telegram bot token.
+        DEV_CHAT_ID -> The chat id of the developer where the bot will send debug messages.
+        GROUP_CHAT_ID -> The chat id of your group.
+        SECRET_KEY -> The secret key for the file decryption process.
+    - Environment variables for configuring the bot in HEROKU.
+        PORT -> The port using for communication.
+        HEROKU_APP_URL -> The url of the Heroku app.
 
 Press Ctrl-C on the command line to stop the bot.
 
@@ -74,14 +79,21 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+# Environment
+ENV: str = os.environ.get("ENV", "dev")
+
 # BOT INFO
-BOT_VERSION: str = "1.8.0"
+BOT_VERSION: str = "1.9.0"
 BOT_NAME: str = "TEMP BOT"
 BOT_DESCRIPTION: str = """Born on: 2022.08.20 in Sri Lanka.\n
 And, Hey, I'm an open-source bot written in Python.
 So you can see inside me literally! - How I handle all your requests...\n
 Btw If you want, you can copy my source code and make your own bot under MIT license.\n
 Also, reporting bugs is always appreciated and pull requests are always welcome! 🤗\n"""
+
+# Heroku Settings
+PORT: str = os.environ.get("PORT", "8443")
+HEROKU_APP_URL: str = os.environ.get("HEROKU_APP_URL", "")
 
 # CHAT/TELEGRAM INFO
 TELEGRAM_TOKEN: str = os.environ["TELEGRAM_TOKEN"]
@@ -653,10 +665,20 @@ def main() -> None:
     application.add_error_handler(error_handler)
     logger.info("Error handler added")
 
-    # Run the bot until the user presses Ctrl-C
-    # Pass 'allowed_updates' handle *all* updates including `chat_member` updates
-    # To reset this, simply pass `allowed_updates=[]`
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    if ENV == "dev":
+        # On Local Environment
+        # Run the bot until the user presses Ctrl-C
+        # Pass 'allowed_updates' handle *all* updates including `chat_member` updates
+        # To reset this, simply pass `allowed_updates=[]`
+        application.run_polling(allowed_updates=Update.ALL_TYPES)
+    else:
+        # On Heroku - Production Environment
+        application.run_webhook(
+            listen="0.0.0.0",
+            port=PORT,
+            url_path=TELEGRAM_TOKEN,
+            webhook_url=HEROKU_APP_URL + TELEGRAM_TOKEN,
+        )
 
 
 if __name__ == "__main__":

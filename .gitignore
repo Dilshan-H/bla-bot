@@ -171,4 +171,4 @@ DATA/KEY_*.txt
 .vscode/
 *.csv
 *.json
-*.txt
+to-do.txt
