@@ -83,7 +83,7 @@ logger = logging.getLogger(__name__)
 ENV: str = os.environ.get("ENV", "dev")
 
 # BOT INFO
-BOT_VERSION: str = "1.9.0"
+BOT_VERSION: str = "0.10.0"
 BOT_NAME: str = "TEMP BOT"
 BOT_DESCRIPTION: str = """Born on: 2022.08.20 in Sri Lanka.\n
 And, Hey, I'm an open-source bot written in Python.
@@ -339,10 +339,10 @@ async def manage_scheduled_tasks(
         logger.warning("No state provided to manage scheduled tasks")
         await update.message.reply_text("You have to specify a state. [on/off]")
         return
-    start_time = time(0, 0, 0, tzinfo=pytz.timezone(TIME_ZONE))
 
     if state == "on":
         remove_task_if_exists(str(chat_id), context)
+        start_time = time(0, 0, 0, tzinfo=pytz.timezone(TIME_ZONE))
         context.job_queue.run_daily(
             check_bdays, start_time, chat_id=chat_id, name=str(chat_id), data=state
         )
@@ -664,6 +664,12 @@ def main() -> None:
     # Handle errors.
     application.add_error_handler(error_handler)
     logger.info("Error handler added")
+
+    # Start the scheduled tasks.
+    start_time = time(0, 35, 0, tzinfo=pytz.timezone(TIME_ZONE))
+    application.job_queue.run_daily(
+        check_bdays, start_time, chat_id=DEV_CHAT_ID, name=str(DEV_CHAT_ID), data="on"
+    )
 
     if ENV == "dev":
         # On Local Environment
