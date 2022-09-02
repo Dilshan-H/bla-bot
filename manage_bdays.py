@@ -13,10 +13,12 @@ import csv
 from datetime import datetime
 from random import choice
 import pytz
+from cryptography.fernet import Fernet
 
 BASE_DIR: str = os.path.dirname(os.path.abspath(__file__))
-data_path: str = os.path.join(BASE_DIR, "DATA", "full_batch_data.csv")
+data_path: str = os.path.join(BASE_DIR, "DATA", "full_batch_data.csv.crypt")
 TIME_ZONE: str = "Asia/Colombo"
+fernet = Fernet(os.environ["SECRET_KEY"])
 
 WISHES: List[str] = [
     "May this birthday be just the beginning of a year filled with wonderful moments...",
@@ -41,8 +43,10 @@ def get_birthdays() -> List[str]:
     """Check for users' birthdays"""
     now = datetime.now().astimezone(pytz.timezone(TIME_ZONE))
     names: List[str] = []
-    with open(file=data_path, mode="r", encoding="utf-8") as data_file:
-        reader = csv.reader(data_file)
+    with open(file=data_path, mode="rb") as data_file:
+        stream = data_file.read()
+        decrypted_data = fernet.decrypt(stream).decode().strip().split("\n")
+        reader = csv.reader(decrypted_data)
         for row in reader:
             try:
                 current_bday = datetime.strptime(row[2], "%Y-%m-%d")
