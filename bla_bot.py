@@ -83,7 +83,7 @@ logger = logging.getLogger(__name__)
 ENV: str = os.environ.get("ENV", "dev")
 
 # BOT INFO
-BOT_VERSION: str = "0.10.0"
+BOT_VERSION: str = "0.10.1"
 BOT_NAME: str = "TEMP BOT"
 BOT_DESCRIPTION: str = """Born on: 2022.08.20 in Sri Lanka.\n
 And, Hey, I'm an open-source bot written in Python.
@@ -266,7 +266,7 @@ async def greet_chat_members(
     if not was_member and is_member:
         await update.effective_chat.send_message(
             f"{member_name} was added by {cause_name}.\nWelcome {member_name}! 🤗 🎉\n\n"
-            "I'm {BOT_NAME} btw. If you like to know what can I do, just type /help.",
+            f"I'm {BOT_NAME} btw. If you like to know what can I do, just type /help.",
             parse_mode=ParseMode.HTML,
         )
     elif was_member and not is_member:
@@ -666,10 +666,11 @@ def main() -> None:
     logger.info("Error handler added")
 
     # Start the scheduled tasks.
-    start_time = time(0, 35, 0, tzinfo=pytz.timezone(TIME_ZONE))
+    start_time = time(0, 0, 0, tzinfo=pytz.timezone(TIME_ZONE))
     application.job_queue.run_daily(
         check_bdays, start_time, chat_id=DEV_CHAT_ID, name=str(DEV_CHAT_ID), data="on"
     )
+    logger.info("Scheduled tasks started")
 
     if ENV == "dev":
         # On Local Environment
