@@ -83,8 +83,8 @@ logger = logging.getLogger(__name__)
 ENV: str = os.environ.get("ENV", "dev")
 
 # BOT INFO
-BOT_VERSION: str = "0.10.1"
-BOT_NAME: str = "TEMP BOT"
+BOT_VERSION: str = "0.11.0"
+BOT_NAME: str = "BLA BOT"
 BOT_DESCRIPTION: str = """Born on: 2022.08.20 in Sri Lanka.\n
 And, Hey, I'm an open-source bot written in Python.
 So you can see inside me literally! - How I handle all your requests...\n
@@ -120,6 +120,7 @@ UNI_DESCRIPTION: str = (
 USER_ID, USER_NIC = range(2)
 QUERY_STAFF = range(1)
 QUERY_USER = range(1)
+ANNOUNCEMENT_QUERY = range(1)
 
 
 def is_authenticated_origin(update: Update) -> bool:
@@ -279,12 +280,11 @@ async def greet_chat_members(
 async def check_bdays(context: ContextTypes.DEFAULT_TYPE) -> None:
     """Check for birthdays and send wishes for users"""
     logger.info("Checking for birthdays")
-    job = context.job
     bday_wishes: List[str] = generate_wish()
 
     for wish in bday_wishes:
         await context.bot.send_message(
-            chat_id=job.chat_id, text=wish, parse_mode=ParseMode.HTML
+            chat_id=GROUP_CHAT_ID, text=wish, parse_mode=ParseMode.HTML
         )
 
 
@@ -477,6 +477,60 @@ async def get_nic(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     return ConversationHandler.END
 
 
+async def get_announcement(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Get announcement to broadcast"""
+    logger.info("/announce command issued by %s", update.effective_user.full_name)
+    logger.info("/announce - Getting user's announcement")
+    chat_id = update.effective_message.chat_id
+    user_id = update.effective_user.id
+
+    if str(user_id) != os.environ["DEV_CHAT_ID"]:
+        logger.warning(
+            "Unauthorized user - %s tried to broadcast announcements", user_id
+        )
+        await update.message.reply_text(
+            "⛔ Sorry, You are not authorized to use this command.\n"
+            "❓ Reason: This command requires elevated privileges."
+        )
+        return
+    if not is_authenticated_origin(update):
+        # Prevent accidental usage by developers
+        logger.warning(
+            "Unauthorized origin - %s tried to broadcast announcements", user_id
+        )
+        await update.message.reply_text(
+            "⛔ Request Rejected! - This chat is unregistered.\n"
+            "❓ Reason: Originated from unrecognized chat id.\n\n"
+            "Please visit https://github.com/dilshan-h/bla-bot to make your own bot."
+        )
+        await alert_dev(
+            f"An attempt was made to broadcast announcements in an unregistered chat\n"
+            f"Chat ID - {chat_id}",
+            2,
+            context,
+        )
+        return
+
+    await update.message.reply_text(
+        "Okay... Let's broadcast an announcement! 👀\n"
+        "Please enter your announcement:\n\n"
+        "If you want to cancel this conversation, just type /cancel."
+    )
+    return ANNOUNCEMENT_QUERY
+
+
+async def send_announcement(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """Broadcast announcements to all registered chats"""
+    logger.info("Broadcasting an announcement")
+    await context.bot.send_message(
+        chat_id=GROUP_CHAT_ID,
+        text=update.message.text,
+        parse_mode=ParseMode.HTML,
+    )
+
+    return ConversationHandler.END
+
+
 async def staff(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     """Get user's search query"""
     logger.info("/staff command issued by %s", update.effective_user.full_name)
@@ -656,6 +710,19 @@ def main() -> None:
     )
     application.add_handler(user_conv_handler)
     logger.info("User Info conversation handler added")
+
+    # Handle conversation - Send Announcements
+    user_conv_handler = ConversationHandler(
+        entry_points=[CommandHandler("announce", get_announcement)],
+        states={
+            QUERY_USER: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, send_announcement)
+            ],
+        },
+        fallbacks=[CommandHandler("cancel", cancel_conversation)],
+    )
+    application.add_handler(user_conv_handler)
+    logger.info("Send announcement conversation handler added")
 
     # Handle unknown commands.
     application.add_handler(MessageHandler(filters.COMMAND, unknown_commands))
