@@ -3,9 +3,18 @@
 An open-source Telegram Bot written in Python - Tailored for universities/higher education institute groups.
 
 - [Features](#features)
+- [Supported Commands in BOT](#supported-commands-in-bot)
+  - [Basic Commands](#basic-commands)
+  - [Academic Related Commands](#academic-related-commands)
+  - [Other Commands](#other-commands)
+- [Basic Requirements](#basic-requirements)
 - [Installation](#installation)
+  - [Using pip](#using-pip)
+  - [Using Poetry](#using-poetry)
 - [Usage](#usage)
+- [Deploying on Heroku Cloud Platform](#deploying-on-heroku-cloud-platform)
 - [Contributing](#contributing)
+- [Credits](#credits)
 - [License & Copyrights](#license--copyrights)
 - [Disclaimer](#disclaimer)
 
@@ -13,7 +22,28 @@ An open-source Telegram Bot written in Python - Tailored for universities/higher
 
 - Free & Open Source
 - Easy to customize & use
--
+- Support for data encryption
+- Enhanced performance with caching
+
+## Supported Commands in BOT
+
+### Basic Commands
+
+- `/start` or `/help` - See all the commands
+- `/whois` - Get info about someone
+- `/about` - Read about the bot
+- `/cancel` - Cancel any running operation
+
+### Academic Related Commands
+
+- `/gpa` - Show your gpa & results
+- `/staff` - Get staff info
+- `/{UNI_NAME_SHORT}` - Read about institute
+
+### Other Commands
+
+- `/tasks` - Manage scheduled tasks (Admin only)
+- `/announce` - Broadcast a message (Admin only)
 
 ## Basic Requirements
 
@@ -27,7 +57,7 @@ An open-source Telegram Bot written in Python - Tailored for universities/higher
 - Heroku Account & Heroku CLI (or suitable platform)
   If you're willing to use Heroku, here they have explained all the steps for getting started with python apps.
 
-      https://devcenter.heroku.com/articles/getting-started-with-python
+  https://devcenter.heroku.com/articles/getting-started-with-python
 
 - Code Editor (such as VS Code)
 
@@ -68,6 +98,12 @@ An open-source Telegram Bot written in Python - Tailored for universities/higher
   pip install -r requirements.txt
   ```
 
+- To properly exit from the virtual environment:
+
+  ```bash
+  deactivate
+  ```
+
 ### Using Poetry
 
 - Resolve and install all the dependencies.
@@ -90,20 +126,27 @@ An open-source Telegram Bot written in Python - Tailored for universities/higher
 
 ## Usage
 
-- Make sure to install the dependencies using above steps first and configure the `BOT INFO`, `CHAT/TELEGRAM INFO`, `TIMEZONE DATA` and `UNIVERSITY INFO` in `bla_bot.py`.
-- If you're willing to deploy in Heroku Platform, make sure to configure the `HEROKU INFO`.
-- The data files (inside `/DATA` directory) must be filled and formatted as requested before encryption.
-- Then run `encrypt_data.py` file (inside `/DATA` directory) to properly encrypt all the data.
-- Following environment variables are used to configure the bot in `PRODUCTION ENVIRONMENT`.
+1. Make sure to install the dependencies using above steps first and configure the `BOT INFO`, `CHAT/TELEGRAM INFO`, `TIMEZONE DATA` and `UNIVERSITY INFO` in `bla_bot.py`.
 
-  - `TELEGRAM_TOKEN` -> Telegram bot token.
-  - `DEV_CHAT_ID` -> The chat id of the developer where the bot will send debug messages.
-  - `GROUP_CHAT_ID` -> The chat id of your group.
-  - `SECRET_KEY` -> The secret key for the file decryption process (You can find your key inside `DATA` directory).
+   To choose the correct time zone, you can query all the supported time zones like this (run this in a seperate terminal):
+
+   ```bash
+   python3 -c "import pytz; print(pytz.all_timezones)"
+   ```
+
+2. If you're willing to deploy in Heroku Platform, make sure to configure the `HEROKU INFO`.
+3. The data files (inside `/DATA` directory) must be filled and formatted as requested, before encrypting.
+4. Then run `encrypt_data.py` file (inside `/DATA` directory) to properly encrypt all the data.
+5. Following environment variables are used to configure the bot in `PRODUCTION/LOCAL ENVIRONMENT`.
+
+   - `TELEGRAM_TOKEN` -> Telegram bot token.
+   - `DEV_CHAT_ID` -> The chat id of the developer where the bot will send debug messages.
+   - `GROUP_CHAT_ID` -> The chat id of your group.
+   - `SECRET_KEY` -> The secret key for the file decryption process (You can find your key inside `DATA` directory).
 
 - Environment variables for configuring the bot in HEROKU.
 
-  - `PORT` -> The port using for communication.
+  - `PORT` -> The port using for communication.
   - `HEROKU_APP_URL` -> The url of the Heroku app.
 
 - Press `Ctrl-C` on the command line to stop the bot.
@@ -111,20 +154,47 @@ An open-source Telegram Bot written in Python - Tailored for universities/higher
 ## Deploying on Heroku Cloud Platform
 
 **NOTE**:
+If you're planning to use Heroku Cloud Platform, under the free plan, the bot will be automatically stopped after some time of inactivity. As a work-around, you can use a service like [Cron-Job.ORG](https://cron-job.org/) (Totally Free) to keep the bot alive in certain times.
 
 > _Heroku Update_  
 > Starting November 28th, 2022, free Heroku Dynos, free Heroku Postgres, and free Heroku Data for Redis® will no longer be available.
 
-To choose the correct time zone, you can query all the supported time zones like this;
+If you have made any changes to the source code, commit those changes using `git add .` followed by `git commit -m "commit-message"`
 
-```python
-import pytz
-pytz.all_timezones
-```
+If you're willing to use Heroku cloud platform, here's how to do that: (A Heroku account, Heroku CLI and Git will be needed - Read [Basic Requirements](#basic-requirements))
 
-If you have made any changes (such as changing the Timezone in routes.py) to the source code, commit those changes using `git add .` and `git commit -m "commit-message"`
+1. Login to Heroku.
+   ```bash
+   heroku login
+   ```
+2. Create a heroku app.
 
-If you're willing to use Heroku cloud platform, here's how to do that: (A Heroku account, Heroku CLI and Git will be needed. (Read [Basic Requirements](#basic-requirements))
+   ```bash
+   heroku create YOUR-APP-NAME
+   ```
+
+3. Next deploy the app:
+
+   ```bash
+   git push heroku main
+   ```
+
+4. Now set the environment variables (You can also set them on your Heroku dashboard):
+
+   ```bash
+    heroku config:set TELEGRAM_TOKEN=YOUR-TELEGRAM-TOKEN
+    heroku config:set DEV_CHAT_ID=YOUR-DEV-CHAT-ID
+    heroku config:set GROUP_CHAT_ID=YOUR-GROUP-CHAT-ID
+    heroku config:set SECRET_KEY=YOUR-SECRET-KEY
+    heroku config:set PORT=YOUR-PORT
+    heroku config:set HEROKU_APP_URL=YOUR-HEROKU-APP-URL
+   ```
+
+## Contributing
+
+Got an idea? Found a bug? Feel free to [open an issue](https://github.com/Dilshan-H/bla-bot/issues/new) or submit a pull request.
+
+Fork the repository, make your changes and submit a pull request. It's that much easy! If you're not sure how to do that, here's a [guide](https://opensource.com/article/19/7/create-pull-request-github).
 
 ## Credits
 
@@ -137,17 +207,13 @@ If you're willing to use Heroku cloud platform, here's how to do that: (A Heroku
 
 python-telegram-bot is distributed under a [LGPLv3 license](https://www.gnu.org/licenses/lgpl-3.0.html).
 
-## Contributing
-
-Got an idea? Found a bug? Feel free to [open an issue](https://github.com/Dilshan-H/bla-bot/issues/new) or submit a pull request.
-
 ## License & Copyrights
 
 **The MIT License**
 
 This program is free software: you can redistribute it and/or modify it under the terms of the **MIT License**
 
-\*\*Heroku, Telegram are copyrights and/or trademarks of their respective owners.
+\*\* Heroku, Telegram are copyrights and/or trademarks of their respective owners.
 
 ## Disclaimer
 
