@@ -83,13 +83,13 @@ logger = logging.getLogger(__name__)
 ENV: str = os.environ.get("ENV", "dev")
 
 # BOT INFO
-BOT_VERSION: str = "0.11.0"
+BOT_VERSION: str = "0.11.1"
 BOT_NAME: str = "BLA BOT"
 BOT_DESCRIPTION: str = """Born on: 2022.08.20 in Sri Lanka.\n
 And, Hey, I'm an open-source bot written in Python.
 So you can see inside me literally! - How I handle all your requests...\n
 Btw If you want, you can copy my source code and make your own bot under MIT license.\n
-Also, reporting bugs is always appreciated and pull requests are always welcome! 🤗\n"""
+Also, reporting bugs is appreciated and pull requests are always welcome! 🤗\n"""
 
 # Heroku Settings
 PORT: str = os.environ.get("PORT", "8443")
@@ -662,7 +662,7 @@ def main() -> None:
     logger.info("Scheduled tasks handler added")
 
     # Handle '/help' command.
-    application.add_handler(CommandHandler("help", help_command))
+    application.add_handler(CommandHandler(["help", "start"], help_command))
     logger.info("Help handler added")
 
     # Handle '/about' command.
