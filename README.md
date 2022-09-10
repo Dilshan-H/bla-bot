@@ -2,6 +2,8 @@
 
 An open-source Telegram Bot written in Python - Tailored for universities/higher education institute groups.
 
+![cover](https://user-images.githubusercontent.com/77499497/189495311-d59a9733-e31b-4fd1-b625-945edaf3f7e6.png)
+
 - [Features](#features)
 - [Supported Commands in BOT](#supported-commands-in-bot)
   - [Basic Commands](#basic-commands)
