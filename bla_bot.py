@@ -375,6 +375,8 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         "/help - 👀 Show this message"
         "\n"
         "/about - ⭐ Read about me"
+        "\n"
+        "/cancel - 🚫 Cancel any running operation"
         "\n\n"
         "<b><u>Academic Related</u></b>"
         "\n\n"
@@ -386,7 +388,9 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         "\n\n"
         "<b><u>Other</u></b>"
         "\n\n"
-        "/tasks - 🕒 Manage scheduled tasks",
+        "/tasks - 🕒 Manage scheduled tasks"
+        "\n"
+        "/announce - 📢 Broadcast a message",
         parse_mode=ParseMode.HTML,
     )
 
