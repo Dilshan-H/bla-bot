@@ -50,14 +50,7 @@ def get_birthdays() -> List[str]:
         for row in reader:
             try:
                 current_bday = datetime.strptime(row[2], "%Y-%m-%d")
-                tmp_date = current_bday.replace(
-                    year=now.year,
-                    hour=now.hour,
-                    minute=now.minute,
-                    second=now.second,
-                    microsecond=now.microsecond,
-                ).astimezone(pytz.timezone(TIME_ZONE))
-                if now == tmp_date:
+                if now.month == current_bday.month and now.day == current_bday.day:
                     names.append(row[9])
             except ValueError:
                 continue
