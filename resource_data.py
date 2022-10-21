@@ -31,7 +31,7 @@ def get_resources(query: str) -> str:
         for row in reader:
             try:
                 for keyword in row[0].split(","):
-                    if fuzz.partial_ratio(query.lower(), keyword.lower()) > 70:
+                    if fuzz.partial_ratio(query.lower(), keyword.lower()) > 80:
                         found_info.append(row)
                         break
             except ValueError:
