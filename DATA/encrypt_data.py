@@ -10,7 +10,12 @@ from typing import List
 from datetime import datetime
 from cryptography.fernet import Fernet
 
-FILES: List[str] = ["full_batch_data.csv", "results.csv", "staff_info.txt"]
+FILES: List[str] = [
+    "full_batch_data.csv",
+    "results.csv",
+    "resources.csv",
+    "staff_info.txt",
+]
 
 key = Fernet.generate_key()
 filename: str = (
@@ -19,17 +24,26 @@ filename: str = (
 # Save the key in the current folder
 with open(filename, "wb") as key_file:
     key_file.write(key)
-
+print(f"Key saved in {filename}")
 
 for file in FILES:
-    with open(file, "rb") as file_to_encrypt:
-        data = file_to_encrypt.read()
-        fernet = Fernet(key)
-        encrypted_data = fernet.encrypt(data)
+    try:
+        with open(file, "rb") as file_to_encrypt:
+            data = file_to_encrypt.read()
+            fernet = Fernet(key)
+            encrypted_data = fernet.encrypt(data)
+    except FileNotFoundError:
+        print(f"File '{file}' not found! -- Resuming...")
+        continue
 
-    with open(file + ".crypt", "wb") as encrypted_file:
-        encrypted_file.write(encrypted_data)
+    try:
+        with open(file + ".crypt", "wb") as encrypted_file:
+            encrypted_file.write(encrypted_data)
+    except Exception as e:
+        print(f"Error occurred while saving encrypted file: '{file}' -- Resuming...")
+        print(e)
+        continue
 
-    print(f"{file} encrypted.")
+    print(f"==== {file} Encrypted. =====")
 
-print("Encryption complete.")
+print("Encryption completed!")
