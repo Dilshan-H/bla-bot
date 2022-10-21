@@ -26,6 +26,7 @@ An open-source Telegram Bot written in Python - Tailored for universities/higher
 - Easy to customize & use
 - Support for data encryption
 - Enhanced performance with caching
+- Intelligent search & indexing
 
 ## Supported Commands in BOT
 
@@ -41,6 +42,7 @@ An open-source Telegram Bot written in Python - Tailored for universities/higher
 - `/gpa` - Show your gpa & results
 - `/staff` - Get staff info
 - `/{UNI_NAME_SHORT}` - Read about institute
+- `/resources` - Explore academic/other resources
 
 ### Other Commands
 
@@ -120,6 +122,12 @@ An open-source Telegram Bot written in Python - Tailored for universities/higher
   poetry shell
   ```
 
+- Start bot
+
+  ```bash
+  poetry run python3 -m bla_bot.py
+  ```
+
 - To properly exit from the shell and the virtual environment:
 
   ```bash
@@ -130,7 +138,7 @@ An open-source Telegram Bot written in Python - Tailored for universities/higher
 
 1. Make sure to install the dependencies using above steps first and configure the `BOT INFO`, `CHAT/TELEGRAM INFO`, `TIMEZONE DATA` and `UNIVERSITY INFO` in `bla_bot.py`.
 
-   To choose the correct time zone, you can query all the supported time zones like this (run this in a seperate terminal):
+   To choose the correct time zone, you can query all the supported time zones like this (run this in a separate terminal):
 
    ```bash
    python3 -c "import pytz; print(pytz.all_timezones)"

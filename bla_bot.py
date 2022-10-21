@@ -67,6 +67,7 @@ from gpa_values import calculate_gpa, get_gpa
 from staff_info import employee_info
 from about_user import user_info
 from manage_bdays import generate_wish
+from resource_data import get_resources
 
 # Enable logging
 # You can also enable logging to file - Just uncomment below lines
@@ -83,7 +84,7 @@ logger = logging.getLogger(__name__)
 ENV: str = os.environ.get("ENV", "dev")
 
 # BOT INFO
-BOT_VERSION: str = "1.0.1-alpha.1"
+BOT_VERSION: str = "1.0.0-beta"
 BOT_NAME: str = "BLA BOT"
 BOT_DESCRIPTION: str = """Born on: 2022.08.20 in Sri Lanka.\n
 And, Hey, I'm an open-source bot written in Python.
@@ -121,6 +122,7 @@ USER_ID, USER_NIC = range(2)
 QUERY_STAFF = range(1)
 QUERY_USER = range(1)
 ANNOUNCEMENT_QUERY = range(1)
+RESOURCE_QUERY = range(1)
 
 
 def is_authenticated_origin(update: Update) -> bool:
@@ -535,6 +537,44 @@ async def send_announcement(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     return ConversationHandler.END
 
 
+async def resources(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+    """Get user's resources query"""
+    logger.info("/resources command issued by %s", update.effective_user.full_name)
+    if not is_authenticated_origin(update):
+        logger.warning(
+            "Unauthorized user - %s tried to use command /resources",
+            update.effective_user.full_name,
+        )
+        await update.message.reply_text(
+            "⛔ Request Rejected! - This command requires elevated privileges.\n"
+            "❓ Reason: Originated from unrecognized chat id.\n\n"
+            "Please visit https://github.com/dilshan-h/bla-bot to make your own bot."
+        )
+        await alert_dev(
+            f"Unauthorized user - {update.effective_user.full_name} tried to use command /resources",
+            2,
+            context,
+        )
+        return
+    logger.info("/resources - Getting user's search query")
+    await update.message.reply_text(
+        "Okay... Let's see what are you looking for! 🧐\n"
+        "Please enter your search query:\n\n"
+        "If you want to cancel this conversation, just type /cancel."
+    )
+    return RESOURCE_QUERY
+
+
+async def send_resources(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """Return resources based on user's query."""
+    logger.info("Received query from user: %s", update.message.text)
+    await update.message.reply_text(
+        get_resources(update.message.text), parse_mode=ParseMode.HTML
+    )
+
+    return ConversationHandler.END
+
+
 async def staff(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     """Get user's search query"""
     logger.info("/staff command issued by %s", update.effective_user.full_name)
@@ -727,6 +767,19 @@ def main() -> None:
     )
     application.add_handler(user_conv_handler)
     logger.info("Send announcement conversation handler added")
+
+    # Handle conversation - Resources
+    resources_conv_handler = ConversationHandler(
+        entry_points=[CommandHandler("resources", resources)],
+        states={
+            RESOURCE_QUERY: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, send_resources)
+            ],
+        },
+        fallbacks=[CommandHandler("cancel", cancel_conversation)],
+    )
+    application.add_handler(resources_conv_handler)
+    logger.info("Resources conversation handler added")
 
     # Handle unknown commands.
     application.add_handler(MessageHandler(filters.COMMAND, unknown_commands))
