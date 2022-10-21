@@ -12,6 +12,7 @@ from functools import lru_cache
 import os
 import csv
 from cryptography.fernet import Fernet
+from thefuzz import fuzz
 
 BASE_DIR: str = os.path.dirname(os.path.abspath(__file__))
 data_path: str = os.path.join(BASE_DIR, "DATA", "full_batch_data.csv.crypt")
@@ -29,7 +30,7 @@ def user_info(query: str) -> str:
         reader = csv.reader(decrypted_data)
         for row in reader:
             for item in row:
-                if query.lower() in item.lower():
+                if fuzz.ratio(query.lower(), item.lower()) > 80:
                     found_info.append(row)
                     break
 

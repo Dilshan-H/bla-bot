@@ -10,6 +10,7 @@ Author: @dilshan-h (https://github.com/dilshan-h)
 import os
 from functools import lru_cache
 from cryptography.fernet import Fernet
+from thefuzz import fuzz
 
 BASE_DIR: str = os.path.dirname(os.path.abspath(__file__))
 data_path: str = os.path.join(BASE_DIR, "DATA", "staff_info.txt.crypt")
@@ -27,7 +28,7 @@ def employee_info(query: str) -> str:
         decrypted_data = fernet.decrypt(stream).decode().strip()
         employees: list = decrypted_data.split("\n\n")
         for employee in employees:
-            if query.lower() in employee.lower():
+            if fuzz.partial_ratio(query.lower(), employee.lower()) > 80:
                 found_info.append(employee)
 
     if not found_info:
