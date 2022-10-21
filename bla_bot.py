@@ -384,6 +384,8 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         "\n\n"
         "/gpa - 📊 Show your GPA data"
         "\n"
+        "/resources - 📚 Explore academic/other resources"
+        "\n"
         "/staff - 👥 Get Staff Info"
         "\n"
         f"/{UNI_NAME_SHORT.lower()} - 🎓 About {UNI_NAME_SHORT}"
