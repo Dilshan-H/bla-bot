@@ -50,11 +50,23 @@ def calculate_gpa(user_nic: str) -> str:
 
     if results == []:
         return "Invalid NIC detected! - Sorry, You are not authorized to continue..."
-    if results[10]:
+    if results[10] == "ERROR":
         return (
             "I can't validate your NIC because it's not registered in database.\n"
             "Please mention/ping admin to update your NIC"
         )
+    elif results[10] == "HOLD":
+        warnings += (
+                f"🔵 Your results are on hold. Partially calculated GPA values are shown."
+            )
+        return
+
+    elif results[10] == "NEW":
+        warnings += (
+                f"🔵 Since calculated GPA values are based on your current results within this batch;"
+                "OGPA, CGPA and Academic Status will not represent accurate information."
+            )
+        return
 
     # Semester GPAs
     count: int = 1
@@ -95,12 +107,22 @@ def calculate_gpa(user_nic: str) -> str:
     message_body += academic_status(cgpa)
 
     # Add academic Warnings
+    if 
     if warnings != "":
         message_body += "\n\n<b><u>Warnings</u></b>\n\n" + warnings
     else:
         message_body += (
             "\n\n<b><u>Warnings</u></b>\n\nCool! 👍 No Academic Warnings for you"
         )
+
+    # Add disclaimer info
+    message_body += (
+        "\n\n<i>Disclaimer: This is an unofficial GPA calculator. "
+        "The results are based on the data provided by the "
+        "University of Moratuwa. "
+        "The University of Moratuwa is not responsible for any "
+        "inaccuracies in the results.</i>"
+    )
 
     return message_body
 
