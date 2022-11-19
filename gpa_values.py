@@ -57,15 +57,15 @@ def calculate_gpa(user_nic: str) -> str:
         )
     elif results[10] == "HOLD":
         warnings += (
-                f"🔵 Your results are on hold. Partially calculated GPA values are shown."
-            )
+            "🔵 Your results are on hold. Partially calculated GPA values are shown."
+        )
         return
 
     elif results[10] == "NEW":
         warnings += (
-                f"🔵 Since calculated GPA values are based on your current results within this batch;"
-                "OGPA, CGPA and Academic Status will not represent accurate information."
-            )
+            "🔵 Since calculated GPA values are based on your current results within this batch;"
+            "OGPA, CGPA and Academic Status will not represent accurate information."
+        )
         return
 
     # Semester GPAs
@@ -107,7 +107,6 @@ def calculate_gpa(user_nic: str) -> str:
     message_body += academic_status(cgpa)
 
     # Add academic Warnings
-    if 
     if warnings != "":
         message_body += "\n\n<b><u>Warnings</u></b>\n\n" + warnings
     else:
@@ -116,13 +115,7 @@ def calculate_gpa(user_nic: str) -> str:
         )
 
     # Add disclaimer info
-    message_body += (
-        "\n\n<i>Disclaimer: This is an unofficial GPA calculator. "
-        "The results are based on the data provided by the "
-        "University of Moratuwa. "
-        "The University of Moratuwa is not responsible for any "
-        "inaccuracies in the results.</i>"
-    )
+    message_body += "\n\n<i>🔹Please note that these data might not reflect the finalized GPA values in some occasions.</i>"
 
     return message_body
 
