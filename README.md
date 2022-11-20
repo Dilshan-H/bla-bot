@@ -15,6 +15,7 @@ An open-source Telegram Bot written in Python - Tailored for universities/higher
   - [Using Poetry](#using-poetry)
 - [Usage](#usage)
 - [Deploying on Heroku Cloud Platform](#deploying-on-heroku-cloud-platform)
+- [To-Do](#to-do)
 - [Contributing](#contributing)
 - [Credits](#credits)
 - [License & Copyrights](#license--copyrights)
@@ -199,6 +200,15 @@ If you're willing to use Heroku cloud platform, here's how to do that: (A Heroku
     heroku config:set PORT=YOUR-PORT
     heroku config:set HEROKU_APP_URL=YOUR-HEROKU-APP-URL
    ```
+
+## To-Do
+
+- Update Docs
+  - Include templates for data files
+  - Add more info about data encryption & steps
+- New Features
+  - User management (Softban/Ban, Mute, Unban, etc.)
+  - Add GPA Calculator base code & modules
 
 ## Contributing
 
