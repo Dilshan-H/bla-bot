@@ -50,6 +50,7 @@ def calculate_gpa(user_nic: str) -> str:
 
     if results == []:
         return "Invalid NIC detected! - Sorry, You are not authorized to continue..."
+
     if results[10] == "ERROR":
         return (
             "I can't validate your NIC because it's not registered in database.\n"
@@ -57,16 +58,13 @@ def calculate_gpa(user_nic: str) -> str:
         )
     elif results[10] == "HOLD":
         warnings += (
-            "🔵 Your results are on hold. Partially calculated GPA values are shown."
+            "🔵 Your results are on hold. Partially calculated GPA values are shown.\n\n"
         )
-        return
-
     elif results[10] == "NEW":
         warnings += (
             "🔵 Since calculated GPA values are based on your current results within this batch;"
-            "OGPA, CGPA and Academic Status will not represent accurate information."
+            "OGPA, CGPA and Academic Status will not represent accurate information.\n\n"
         )
-        return
 
     # Semester GPAs
     count: int = 1
