@@ -816,7 +816,7 @@ def main() -> None:
             listen="0.0.0.0",
             port=PORT,
             url_path=TELEGRAM_TOKEN,
-            webhook_url=HEROKU_APP_URL + TELEGRAM_TOKEN,
+            webhook_url=RENDER_APP_URL + TELEGRAM_TOKEN,
         )
 
 
