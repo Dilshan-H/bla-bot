@@ -226,7 +226,7 @@ If you have made any changes to the source code, commit those changes using `gi
 ### Let's Deploy on Render!
 You can deploy your bot on Render in just a few clicks. Just click on the button below and follow the instructions.
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Dilshan-H/bla-bot)
 
 -- OR DO IT MANUALLY --
 

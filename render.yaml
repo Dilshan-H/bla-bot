@@ -1,0 +1,23 @@
+services:
+  # BLA-BOT web service
+  - type: web
+    name: blabot
+    env: python
+    plan: free
+    repo: https://github.com/Dilshan-H/bla-bot.git
+    healthCheckPath: /
+    envVars:
+      - key: ENV
+        value: prod
+      - key: PORT
+        value: 8443
+      - key: DEV_CHAT_ID
+        sync: false
+      - key: GROUP_CHAT_ID
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: TELEGRAM_TOKEN
+        sync: false
+      - key: RENDER_APP_URL
+        sync: false

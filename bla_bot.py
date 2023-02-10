@@ -273,11 +273,18 @@ async def greet_chat_members(
     member_name = update.chat_member.new_chat_member.user.mention_html()
 
     if not was_member and is_member:
-        await update.effective_chat.send_message(
-            f"{member_name} was added by {cause_name}.\nWelcome {member_name}! 🤗 🎉\n\n"
-            f"I'm {BOT_NAME} btw. If you like to know what can I do, just type /help.",
-            parse_mode=ParseMode.HTML,
-        )
+        if member_name == cause_name:
+            await update.effective_chat.send_message(
+                f"Welcome {member_name}! 🤗 🎉\nHappy to see you here!"
+                f"I'm {BOT_NAME} btw. If you like to know what can I do, just type /help.",
+                parse_mode=ParseMode.HTML,
+            )
+        else:
+            await update.effective_chat.send_message(
+                f"{member_name} was added by {cause_name}.\nWelcome {member_name}! 🤗 🎉\n\n"
+                f"I'm {BOT_NAME} btw. If you like to know what can I do, just type /help.",
+                parse_mode=ParseMode.HTML,
+            )
     elif was_member and not is_member:
         await update.effective_chat.send_message(
             f"{member_name} is no longer with us... See you soon {member_name}! 🙌",
