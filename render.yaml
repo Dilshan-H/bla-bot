@@ -3,6 +3,8 @@ services:
   - type: web
     name: blabot
     env: python
+    startCommand: python3 bla_bot.py
+    buildCommand: pip install -r requirements.txt
     plan: free
     repo: https://github.com/Dilshan-H/bla-bot.git
     healthCheckPath: /
