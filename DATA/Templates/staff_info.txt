@@ -1,0 +1,25 @@
+# STAFF info is stored in here.
+# Contact information that relates to a single person written as blocks. And, each bock is seperated with a newline (new empty line).
+# See examples given below.
+
+# ----- Begining of the file -----
+
+Dr. A.B. John Doe
+DEAN, FACULTY OF ABC
+Office: 0123456789
+Email: abc@uni.com
+
+Mr. Alex White
+HEAD, DEPARTMENT OF ABC
+Office: 0123456789
+Email: abc@uni.com, abc@alex.com
+
+Ms. Jane Doe
+Assistant Registrar - Faculty of ABC
+Direct Line: 0123456789
+Office: 0123456789
+Extension: 1234
+Email: abc@uni.com
+Fax: 0123456789
+
+# ----- End of the file -----

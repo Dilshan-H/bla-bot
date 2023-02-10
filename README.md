@@ -4,6 +4,9 @@ An open-source Telegram Bot written in Python - Tailored for universities/higher
 
 ![cover](https://user-images.githubusercontent.com/77499497/189495311-d59a9733-e31b-4fd1-b625-945edaf3f7e6.png)
 
+## **UPDATE**: Since `Heroku` is no longer providing free dynos, [Render](https://render.com/) is now the recommended platform for deploying this bot.
+
+
 - [Features](#features)
 - [Supported Commands in BOT](#supported-commands-in-bot)
   - [Basic Commands](#basic-commands)
@@ -14,7 +17,9 @@ An open-source Telegram Bot written in Python - Tailored for universities/higher
   - [Using pip](#using-pip)
   - [Using Poetry](#using-poetry)
 - [Usage](#usage)
-- [Deploying on Heroku Cloud Platform](#deploying-on-heroku-cloud-platform)
+  - [Testing on your Local Machine](#testing-on-your-local-machine)
+  - [Deploying on Render](#deploying-on-render)
+  - [Deploying on Heroku Cloud Platform [Deprecated]](#deploying-on-heroku-cloud-platform)
 - [To-Do](#to-do)
 - [Contributing](#contributing)
 - [Credits](#credits)
@@ -28,10 +33,22 @@ An open-source Telegram Bot written in Python - Tailored for universities/higher
 - Support for data encryption
 - Enhanced performance with caching
 - Intelligent search & indexing
+- Logging enabled
+- Secure & Private
+
+## Why use **BLA-BOT** in your academic group?
+
+- **Easy to use**: The bot is easy to use and understand. You can add BLA-BOT to your academic group and easily provide information to your fellow students.
+- **Cool features**: BLA-BOT has some cool features like GPA info, birthday wishes, announce to your group as bot, additional academic resources and much more.
+- **Easy to customize**: The bot is easy to customize and modify according to your needs.
+- **Secure**: The bot is secure and private. Users only see the data they are authorized to see. Even though any other 3rd party can add your bot to their group, they won't be able to utilize some of the bot's features. (like results, student info, etc.) Some of the features are only available to the group admins.
+Additionally, if any unauthorized person tries to access the bot's data, they won't be able to do so. The data is encrypted and only the bot can decrypt it.
+- **Unauthorized access alert**: The bot will alert the group admins about the unauthorized access attempts via dm (This only works if you have already interacted with your bot via dm previously).
+- **Documentation**: The bot is well documented and has a detailed README file. You can easily understand how the bot works and how to customize it according to your needs.
 
 ## Supported Commands in BOT
 
-### Basic Commands
+### General Commands
 
 - `/start` or `/help` - See all the commands
 - `/whois` - Get info about someone
@@ -59,12 +76,15 @@ An open-source Telegram Bot written in Python - Tailored for universities/higher
   https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
   https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup
 
-- Heroku Account & Heroku CLI (or suitable platform)
-  If you're willing to use Heroku, here they have explained all the steps for getting started with python apps.
+- Render Account (either free or paid) - https://render.com/
 
-  https://devcenter.heroku.com/articles/getting-started-with-python
+  -- OR --
+
+  Your preferred cloud platform (such as Heroku) - Ex:
+  Heroku Account & Heroku CLI if you're willing to use Heroku, [Here](https://devcenter.heroku.com/articles/getting-started-with-python) they have explained all the steps for getting started with python apps.
 
 - Code Editor (such as VS Code)
+- GitHub/GitLab Account for deploying the bot with Render
 
 ## Installation
 
@@ -103,7 +123,9 @@ An open-source Telegram Bot written in Python - Tailored for universities/higher
   pip install -r requirements.txt
   ```
 
-- To properly exit from the virtual environment:
+  Now go ahead and configure your bot according to your needs. (See [Usage](#usage)) 
+
+- Whenever you need to properly exit from the virtual environment, just run the following command:
 
   ```bash
   deactivate
@@ -123,13 +145,9 @@ An open-source Telegram Bot written in Python - Tailored for universities/higher
   poetry shell
   ```
 
-- Start bot
+  Now go ahead and configure your bot according to your needs. (See [Usage](#usage)) 
 
-  ```bash
-  poetry run python3 -m bla_bot.py
-  ```
-
-- To properly exit from the shell and the virtual environment:
+- Whenever you need to properly exit from the shell and the virtual environment run the following command :
 
   ```bash
   exit
@@ -137,75 +155,152 @@ An open-source Telegram Bot written in Python - Tailored for universities/higher
 
 ## Usage
 
-1. Make sure to install the dependencies using above steps first and configure the `BOT INFO`, `CHAT/TELEGRAM INFO`, `TIMEZONE DATA` and `UNIVERSITY INFO` in `bla_bot.py`.
+1. Make sure to install the dependencies using above steps first.
 
-   To choose the correct time zone, you can query all the supported time zones like this (run this in a separate terminal):
+2. Configure the `BOT INFO`, `TIMEZONE DATA` and `UNIVERSITY INFO` in `bla_bot.py`.
+    - To choose the correct time zone for `TIME_ZONE`, you can query all the supported time zones like this (run this in a separate terminal):
 
-   ```bash
-   python3 -c "import pytz; print(pytz.all_timezones)"
-   ```
+      ```bash
+      python3 -c "import pytz; print(pytz.all_timezones)"
+      ```
+      Type the name of the time zone you want to use in `TIME_ZONE` variable.
+    - Replace university name, short name, and other info in `UNIVERSITY_INFO` section.
 
-2. If you're willing to deploy in Heroku Platform, make sure to configure the `HEROKU INFO`.
-3. The data files (inside `/DATA` directory) must be filled and formatted as requested, before encrypting.
-4. Then run `encrypt_data.py` file (inside `/DATA` directory) to properly encrypt all the data.
-5. Following environment variables are used to configure the bot in `PRODUCTION/LOCAL ENVIRONMENT`.
+3. The data files (inside `/DATA` directory) must be filled and formatted as requested, before encrypting. Then run `encrypt_data.py` file (inside `/DATA` directory) to properly encrypt all the data. ([Read More](/DATA/README.md#data-formatting--encrypting))
+4. Obtain a telegram bot token from [BotFather](https://t.me/BotFather) (This will be needed as we proceed further.). Start a conversation with BotFather on Telegram and follow the instructions to create a new bot. You will receive a token that you can use to authorize your bot and send requests to the Bot API.
+5. Obtain your personal chat id (This is what we call `DEV_CHAT_ID`) and group chat id (This is what we call `GROUP_CHAT_ID`, id of the group that you're going to add the bot) using [IDBot](https://t.me/myidbot) (These ids will be needed as we proceed further.). Start a conversation with IDBot on Telegram and follow the instructions to get your chat ids.
+
+## Testing on your Local Machine
+
+**NOTE**: Following environment variables are used to configure the bot in `PRODUCTION/LOCAL ENVIRONMENT`.
 
    - `TELEGRAM_TOKEN` -> Telegram bot token.
    - `DEV_CHAT_ID` -> The chat id of the developer where the bot will send debug messages.
    - `GROUP_CHAT_ID` -> The chat id of your group.
-   - `SECRET_KEY` -> The secret key for the file decryption process (You can find your key inside `DATA` directory).
+   - `SECRET_KEY` -> The secret key for the file decryption process (You can find your key inside `DATA` directory).  
 
-- Environment variables for configuring the bot in HEROKU.
+1. You can set these environment variables in your terminal using the following commands:
 
-  - `PORT` -> The port using for communication.
-  - `HEROKU_APP_URL` -> The url of the Heroku app.
+    ```bash
+    export DEV_CHAT_ID=use_your_chat_id_here_obtained_from_idbot
+    export TELEGRAM_TOKEN=use_your_telegram_token_obtained_from_botfather_earlier
+    export SECRET_KEY=use_your_secret_key_here_obtained_from_encrypting_data
+    export GROUP_CHAT_ID=use_your_group_chat_id_here_obtained_from_idbot
 
-- Press `Ctrl-C` on the command line to stop the bot.
+    ```
+2. Run the bot using the following command:
 
-## Deploying on Heroku Cloud Platform
+    On Linux:
+
+    ```bash
+    python3 bla_bot.py
+    ```
+    On Windows:
+
+    ```bash
+    py bla_bot.py
+    ```
+    On Linux using Poetry:
+
+    ```bash
+    poetry run python3 bla_bot.py
+    ```
+
+    Cool! Now you can start using your bot.  
+    Open the Telegram app and search for your bot and start a conversation with it.
+    Send `/help` to your bot to see the list of commands. Test all other features and make sure everything is working as expected.
+
+3. Press `Ctrl-C` on the command line to stop the bot.
+
+## Deploying on Render
+
+[Render](https://render.com/) is a cloud platform that allows you to deploy your apps in a few clicks. It's free for small projects and has a generous free tier.
 
 **NOTE**:
-If you're planning to use Heroku Cloud Platform, under the free plan, the bot will be automatically stopped after some time of inactivity. As a work-around, you can use a service like [Cron-Job.ORG](https://cron-job.org/) (Totally Free) to keep the bot alive in certain times.
+If you're planning to use Render Cloud Platform, under the free plan, the bot will be automatically stopped after some time of inactivity (~15 minutes). As a work-around, you can use a service like [Cron-Job.ORG](https://cron-job.org/) (Totally Free) to keep the bot alive in certain times.
 
+
+
+If you have made any changes to the source code, commit those changes using `git add .` followed by `git commit -m "your-commit-message"` and then push those changes to your REMOTE branch on either GitHub or GitLab.
+
+### Let's Deploy on Render!
+You can deploy your bot on Render in just a few clicks. Just click on the button below and follow the instructions.
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
+
+-- OR DO IT MANUALLY --
+
+1. Login to your [Render account](https://dashboard.render.com/).
+2. Click on `New Service` and select **web service**.
+3. Now you can connect your GitHub or GitLab repository to Render.
+
+After this process, you have to configure the environment variables as mentioned above. You can find environment variables section in the `Environment` tab of your web service.
+
+Add these keys and respective values to the environment variables:
+
+| Key            | Value                                                                                                                                                                    |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| DEV_CHAT_ID    | Your chat id obtained from _idbot_                                                                                                                                       |
+| ENV            | `prod`                                                                                                                                                                   |
+| GROUP_CHAT_ID  | Your group chat id obtained from _idbot_                                                                                                                                 |
+| RENDER_APP_URL | The url of the Render app. (Ex: `https://my-bot-name.onrender.com`) - Can obtain from [Render Dashboard]([https://dashboard.render.com/](https://dashboard.render.com/)) |
+| PORT           | `8443`                                                                                                                                                                   |
+| SECRET_KEY     | Your secret key here obtained after data encryption procedure                                                                                                            |
+| TELEGRAM_TOKEN | Your Telegram token obtained from _botfather_ earlier                                                                                                                 
+
+Now click on `Save Changes` and your bot will be deployed on Render. If everything goes well, you can start using your bot right away. Open the Telegram app and search for your bot and start a conversation with it. Send `/help` to your bot to see the list of commands. Test all other features and make sure everything is working as expected.
+
+Then add your bot to your group and start using it.
+
+**NOTE**:  
+You can use BotFather to change the bot's name and profile picture. Also do not forget to add all the commands to your bot using BotFather (Edit Commands). So, users can easily browse all the commands.
+
+## Deploying on Heroku Cloud Platform [Deprecated]
 > _Heroku Update_  
 > Starting November 28th, 2022, free Heroku Dynos, free Heroku Postgres, and free Heroku Data for Redis® will no longer be available.
 
-If you have made any changes to the source code, commit those changes using `git add .` followed by `git commit -m "commit-message"`
+<details>
+  <summary>Steps to configure on Heroku</summary>
 
-If you're willing to use Heroku cloud platform, here's how to do that: (A Heroku account, Heroku CLI and Git will be needed - Read [Basic Requirements](#basic-requirements))
+  **NOTE**:
+  If you're planning to use Heroku Cloud Platform, under the free plan, the bot will be automatically stopped after some time of inactivity. As a work-around, you can use a service like [Cron-Job.ORG](https://cron-job.org/) (Totally Free) to keep the bot alive in certain times.
 
-1. Login to Heroku.
-   ```bash
-   heroku login
-   ```
-2. Create a heroku app.
+  If you have made any changes to the source code, commit those changes using `git add .` followed by `git commit -m "commit-message"`
 
-   ```bash
-   heroku create YOUR-APP-NAME
-   ```
+  If you're willing to use Heroku cloud platform, here's how to do that: (A Heroku account, Heroku CLI and Git will be needed - Read [Basic Requirements](#basic-requirements))
 
-3. Next deploy the app:
+  1. Login to Heroku.
+      ```bash
+      heroku login
+      ```
+  2. Create a heroku app.
 
-   ```bash
-   git push heroku main
-   ```
+      ```bash
+      heroku create YOUR-APP-NAME
+      ```
 
-4. Now set the environment variables (You can also set them on your Heroku dashboard):
+  3. Next deploy the app:
 
-   ```bash
-    heroku config:set TELEGRAM_TOKEN=YOUR-TELEGRAM-TOKEN
-    heroku config:set DEV_CHAT_ID=YOUR-DEV-CHAT-ID
-    heroku config:set GROUP_CHAT_ID=YOUR-GROUP-CHAT-ID
-    heroku config:set SECRET_KEY=YOUR-SECRET-KEY
-    heroku config:set PORT=YOUR-PORT
-    heroku config:set HEROKU_APP_URL=YOUR-HEROKU-APP-URL
-   ```
+      ```bash
+      git push heroku main
+      ```
+
+  4. Now set the environment variables (You can also set them on your Heroku dashboard):
+
+      ```bash
+        heroku config:set TELEGRAM_TOKEN=YOUR-TELEGRAM-TOKEN
+        heroku config:set DEV_CHAT_ID=YOUR-DEV-CHAT-ID
+        heroku config:set GROUP_CHAT_ID=YOUR-GROUP-CHAT-ID
+        heroku config:set SECRET_KEY=YOUR-SECRET-KEY
+        heroku config:set PORT=8443
+        heroku config:set HEROKU_APP_URL=YOUR-HEROKU-APP-URL
+        heroku config:set ENV=prod
+      ```
+</details>
+
 
 ## To-Do
 
-- Update Docs
-  - Include templates for data files
-  - Add more info about data encryption & steps
 - New Features
   - User management (Softban/Ban, Mute, Unban, etc.)
   - Add GPA Calculator base code & modules
@@ -233,7 +328,7 @@ python-telegram-bot is distributed under a [LGPLv3 license](https://www.gnu.org
 
 This program is free software: you can redistribute it and/or modify it under the terms of the **MIT License**
 
-\*\* Heroku, Telegram are copyrights and/or trademarks of their respective owners.
+\*\* Render, Heroku, Telegram, VS Code are copyrights and/or trademarks of their respective owners.
 
 ## Disclaimer
 

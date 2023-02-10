@@ -166,9 +166,9 @@ cython_debug/
 #  Add any custom files and folders you don't want to be tracked by git in this file.
 
 # Secret Key File
-DATA/KEY_*.txt
+DATA/*.csv
+DATA/*.txt
 
 .vscode/
-*.csv
 *.json
 to-do.txt

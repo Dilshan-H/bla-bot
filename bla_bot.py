@@ -84,7 +84,7 @@ logger = logging.getLogger(__name__)
 ENV: str = os.environ.get("ENV", "dev")
 
 # BOT INFO
-BOT_VERSION: str = "1.0.6-beta"
+BOT_VERSION: str = "1.0.7-beta"
 BOT_NAME: str = "BLA BOT"
 BOT_DESCRIPTION: str = """Born on: 2022.08.20 in Sri Lanka.\n
 And, Hey, I'm an open-source bot written in Python.
@@ -92,9 +92,15 @@ So you can see inside me literally! - How I handle all your requests...\n
 Btw If you want, you can copy my source code and make your own bot under MIT license.\n
 Also, reporting bugs is appreciated and pull requests are always welcome! 🤗\n"""
 
-# Heroku Settings
+# Render Settings
 PORT: str = os.environ.get("PORT", "8443")
-HEROKU_APP_URL: str = os.environ.get("HEROKU_APP_URL", "")
+RENDER_APP_URL: str = os.environ.get("RENDER_APP_URL", "")
+
+# Heroku Settings [Depreciated]
+# -----------------------------
+# Uncomment below two lines if you're willing to deploy in Heroku Platform.
+# PORT: str = os.environ.get("PORT", "8443")
+# HEROKU_APP_URL: str = os.environ.get("HEROKU_APP_URL", "")
 
 # CHAT/TELEGRAM INFO
 TELEGRAM_TOKEN: str = os.environ["TELEGRAM_TOKEN"]
