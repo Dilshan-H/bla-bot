@@ -18,6 +18,10 @@ FILES: List[str] = [
 ]
 
 key = Fernet.generate_key()
+# If you have a key, you can use it instead of generating a new one
+# Uncomment the following line and paste your key
+# key = "paste_your_key_here"
+
 filename: str = (
     "KEY_" + datetime.now().strftime("%Y-%m-%d %H:%M:%S").replace(":", "_") + ".txt"
 )
