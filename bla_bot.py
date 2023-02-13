@@ -133,7 +133,7 @@ RESOURCE_QUERY = range(1)
 
 def is_authenticated_origin(update: Update) -> bool:
     """
-    Checks if the update originated from the group chat.
+    Checks if the update originated from the group chat or the developer chat.
     """
     logger.info("Authentication request originated from ID: %s", update.message.chat.id)
     return (
@@ -180,6 +180,7 @@ async def alert_dev(message: str, alert_type: int, context: ContextTypes) -> Non
         0 -> Error
         1 -> Update
         2 -> Warning
+        3 -> Unauthorized Usage
     """
     logger.info("Sending new update to developer - Type: %s", alert_type)
     if alert_type == 0:
@@ -342,6 +343,22 @@ async def manage_scheduled_tasks(
             "⛔ Sorry, You are not authorized to use this command.\n"
             "❓ Reason: This command requires elevated privileges."
         )
+        await alert_dev(
+            f"An attempt was made to handle scheduled tasks by an unauthorized user.\n\n"
+            f"<b><u>Chat Info</u></b>\n"
+            f"<b>Chat Title</b>: {update.effective_chat.title}\n"
+            f"<b>Chat ID</b>: {chat_id}\n"
+            f"<b>Chat Type</b>: {update.effective_chat.type}\n"
+            f"\n"
+            f"<b><u>User Info</u></b>\n"
+            f"<b>User ID</b>: {user_id}\n"
+            f"<b>Username</b>: @{update.effective_user.username}\n"
+            f"<b>First Name</b>: {update.effective_user.first_name}\n"
+            f"<b>Last Name</b>: {update.effective_user.last_name}\n"
+            f"<b>Language Code</b>: {update.effective_user.language_code}\n",
+            3,
+            context,
+        )
         return
     if not is_authenticated_origin(update):
         # Prevent accidental usage by developers
@@ -350,12 +367,13 @@ async def manage_scheduled_tasks(
         )
         await update.message.reply_text(
             "⛔ Request Rejected! - This chat is unregistered.\n"
-            "❓ Reason: Originated from unrecognized chat id.\n\n"
-            "Please visit https://github.com/dilshan-h/bla-bot to make your own bot."
+            "❓ Reason: Originated from unrecognized chat id."
         )
         await alert_dev(
-            f"An attempt was made to handle scheduled tasks in an unregistered chat\n"
-            f"Chat ID - {chat_id}",
+            f"An attempt was made to handle scheduled tasks in an unregistered chat.\n\n"
+            f"<b>Chat ID</b>: {chat_id}\n"
+            f"<b>Chat Type</b>: {update.effective_chat.type}\n"
+            f"<b>Chat Title</b>: {update.effective_chat.title}\n",
             2,
             context,
         )
@@ -468,8 +486,19 @@ async def gpa(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
             "Please visit https://github.com/dilshan-h/bla-bot to make your own bot."
         )
         await alert_dev(
-            f"Unauthorized user - {update.effective_user.full_name} tried to use command /gpa",
-            2,
+            f"An attempt was made to use <b>/gpa</b> command by an unauthorized user.\n\n"
+            f"<b><u>Chat Info</u></b>\n"
+            f"<b>Chat Title</b>: {update.effective_chat.title}\n"
+            f"<b>Chat ID</b>: {update.effective_chat.id}\n"
+            f"<b>Chat Type</b>: {update.effective_chat.type}\n"
+            f"\n"
+            f"<b><u>User Info</u></b>\n"
+            f"<b>User ID</b>: {update.effective_user.id}\n"
+            f"<b>Username</b>: @{update.effective_user.username}\n"
+            f"<b>First Name</b>: {update.effective_user.first_name}\n"
+            f"<b>Last Name</b>: {update.effective_user.last_name}\n"
+            f"<b>Language Code</b>: {update.effective_user.language_code}\n",
+            3,
             context,
         )
         return
@@ -527,6 +556,22 @@ async def get_announcement(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             "⛔ Sorry, You are not authorized to use this command.\n"
             "❓ Reason: This command requires elevated privileges."
         )
+        await alert_dev(
+            f"An attempt was made to use <b>/announce</b> command by an unauthorized user.\n\n"
+            f"<b><u>Chat Info</u></b>\n"
+            f"<b>Chat Title</b>: {update.effective_chat.title}\n"
+            f"<b>Chat ID</b>: {chat_id}\n"
+            f"<b>Chat Type</b>: {update.effective_chat.type}\n"
+            f"\n"
+            f"<b><u>User Info</u></b>\n"
+            f"<b>User ID</b>: {user_id}\n"
+            f"<b>Username</b>: @{update.effective_user.username}\n"
+            f"<b>First Name</b>: {update.effective_user.first_name}\n"
+            f"<b>Last Name</b>: {update.effective_user.last_name}\n"
+            f"<b>Language Code</b>: {update.effective_user.language_code}\n",
+            3,
+            context,
+        )
         return
     if not is_authenticated_origin(update):
         # Prevent accidental usage by developers
@@ -536,11 +581,12 @@ async def get_announcement(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         await update.message.reply_text(
             "⛔ Request Rejected! - This chat is unregistered.\n"
             "❓ Reason: Originated from unrecognized chat id.\n\n"
-            "Please visit https://github.com/dilshan-h/bla-bot to make your own bot."
         )
         await alert_dev(
-            f"An attempt was made to broadcast announcements in an unregistered chat\n"
-            f"Chat ID - {chat_id}",
+            f"An attempt was made to broadcast announcements in an unregistered chat.\n\n"
+            f"<b>Chat ID</b>: {chat_id}\n"
+            f"<b>Chat Type</b>: {update.effective_chat.type}\n"
+            f"<b>Chat Title</b>: {update.effective_chat.title}\n",
             2,
             context,
         )
@@ -580,8 +626,19 @@ async def resources(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
             "Please visit https://github.com/dilshan-h/bla-bot to make your own bot."
         )
         await alert_dev(
-            f"Unauthorized user - {update.effective_user.full_name} tried to use command /resources",
-            2,
+            f"An attempt was made to use <b>/resources</b> command by an unauthorized user.\n\n"
+            f"<b><u>Chat Info</u></b>\n"
+            f"<b>Chat Title</b>: {update.effective_chat.title}\n"
+            f"<b>Chat ID</b>: {update.effective_chat.id}\n"
+            f"<b>Chat Type</b>: {update.effective_chat.type}\n"
+            f"\n"
+            f"<b><u>User Info</u></b>\n"
+            f"<b>User ID</b>: {update.effective_user.id}\n"
+            f"<b>Username</b>: @{update.effective_user.username}\n"
+            f"<b>First Name</b>: {update.effective_user.first_name}\n"
+            f"<b>Last Name</b>: {update.effective_user.last_name}\n"
+            f"<b>Language Code</b>: {update.effective_user.language_code}\n",
+            3,
             context,
         )
         return
@@ -640,8 +697,19 @@ async def whois(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Union[Non
             "Please visit https://github.com/dilshan-h/bla-bot to make your own bot."
         )
         await alert_dev(
-            f"Unauthorized user - {update.effective_user.full_name} tried to use command /whois",
-            2,
+            f"An attempt was made to use <b>/whois</b> command by an unauthorized user.\n\n"
+            f"<b><u>Chat Info</u></b>\n"
+            f"<b>Chat Title</b>: {update.effective_chat.title}\n"
+            f"<b>Chat ID</b>: {update.effective_chat.id}\n"
+            f"<b>Chat Type</b>: {update.effective_chat.type}\n"
+            f"\n"
+            f"<b><u>User Info</u></b>\n"
+            f"<b>User ID</b>: {update.effective_user.id}\n"
+            f"<b>Username</b>: @{update.effective_user.username}\n"
+            f"<b>First Name</b>: {update.effective_user.first_name}\n"
+            f"<b>Last Name</b>: {update.effective_user.last_name}\n"
+            f"<b>Language Code</b>: {update.effective_user.language_code}\n",
+            3,
             context,
         )
         return
