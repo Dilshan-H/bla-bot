@@ -1,13 +1,11 @@
 services:
   # BLA-BOT web service
   - type: web
-    name: blabot
+    name: bla-bot
     env: python
     startCommand: python3 bla_bot.py
     buildCommand: pip install -r requirements.txt
     plan: free
-    repo: https://github.com/Dilshan-H/bla-bot.git
-    healthCheckPath: /
     envVars:
       - key: ENV
         value: prod
