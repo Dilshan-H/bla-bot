@@ -262,10 +262,10 @@ If you have made any changes to the source code, commit those changes using `gi
 
   Now open your web browser and visit the following URL - Make sure to replace the string `{YOUR-BOT-TOKEN}` with your bot's token and the `{RENDER-URL}` with your web service URL.  
   
-  https://api.telegram.org/bot`{YOUR-BOT-TOKEN}`/setWebhook?url=`{RENDER-URL}`
+  https://api.telegram.org/bot{YOUR-BOT-TOKEN}/setWebhook?url={RENDER-URL}
 
   You can verify webhook information using following URL:  
-  https://api.telegram.org/bot`{YOUR-BOT-TOKEN}`/getWebhookInfo
+  https://api.telegram.org/bot{YOUR-BOT-TOKEN}/getWebhookInfo
   
   
   If everything goes well, you can start using your bot right away. Open the Telegram app and search for your bot and start a conversation with it. Send `/help` to your bot to see the list of commands. Test all other features and make sure everything is working as expected.
