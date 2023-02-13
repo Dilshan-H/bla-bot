@@ -189,18 +189,30 @@ async def alert_dev(message: str, alert_type: int, context: ContextTypes) -> Non
             parse_mode=ParseMode.HTML,
         )
         return
-    if alert_type == 1:
+    elif alert_type == 1:
         await context.bot.send_message(
             chat_id=DEV_CHAT_ID,
             text=(f"🔵 <b><u>{BOT_NAME} -  New Update</u></b>\n\n" f"{message}"),
             parse_mode=ParseMode.HTML,
         )
         return
-    await context.bot.send_message(
-        chat_id=DEV_CHAT_ID,
-        text=(f"⏺ <b><u>{BOT_NAME} -  Warning</u></b>\n\n" f"{message}"),
-        parse_mode=ParseMode.HTML,
-    )
+    elif alert_type == 2:
+        await context.bot.send_message(
+            chat_id=DEV_CHAT_ID,
+            text=(f"⏺ <b><u>{BOT_NAME} -  Warning</u></b>\n\n" f"{message}"),
+            parse_mode=ParseMode.HTML,
+        )
+        return
+    elif alert_type == 3:
+        await context.bot.send_message(
+            chat_id=DEV_CHAT_ID,
+            text=(f"⛔ <b><u>{BOT_NAME} -  Unauthorized Usage</u></b>\n\n" f"{message}"),
+            parse_mode=ParseMode.HTML,
+        )
+        return
+    else:
+        logger.error("Invalid alert type provided. [Accepted: 0, 1, 2, 3]")
+        return
 
 
 async def track_chats(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
