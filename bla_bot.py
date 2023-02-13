@@ -352,7 +352,9 @@ async def manage_scheduled_tasks(
         state = context.args[0].lower()
     except IndexError:
         logger.warning("No state provided to manage scheduled tasks")
-        await update.message.reply_text("You have to specify a state. [on/off]")
+        await update.message.reply_text(
+            "You have to specify a state. [on/off]- E.g. /tasks on"
+        )
         return
 
     if state == "on":
@@ -420,7 +422,7 @@ async def about_bot(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "\n"
         f"{BOT_DESCRIPTION}"
         "\n\n"
-        "Made with ❤️ by <a href='https://github.com/dilshan-h'>@Dilshan-h</a>"
+        "Made with ❤️ by <a href='https://github.com/dilshan-h'>@Dilshan-H</a>"
         "\n\n"
         "Review my source code <a href='https://github.com/dilshan-h'>@GitHub</a>",
         parse_mode=ParseMode.HTML,
@@ -573,7 +575,7 @@ async def resources(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
         return
     logger.info("/resources - Getting user's search query")
     await update.message.reply_text(
-        "Okay... Let's see what are you looking for! 🧐\n"
+        "Okay... Let's see what you are looking for! 🧐\n"
         "Please enter your search query:\n\n"
         "If you want to cancel this conversation, just type /cancel."
     )
