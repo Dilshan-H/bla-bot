@@ -84,7 +84,7 @@ logger = logging.getLogger(__name__)
 ENV: str = os.environ.get("ENV", "dev")
 
 # BOT INFO
-BOT_VERSION: str = "1.0.7-beta"
+BOT_VERSION: str = "1.0.8-beta"
 BOT_NAME: str = "BLA BOT"
 BOT_DESCRIPTION: str = """Born on: 2022.08.20 in Sri Lanka.\n
 And, Hey, I'm an open-source bot written in Python.
