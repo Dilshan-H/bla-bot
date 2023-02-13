@@ -19,7 +19,10 @@ An open-source Telegram Bot written in Python - Tailored for universities/higher
 - [Usage](#usage)
   - [Testing on your Local Machine](#testing-on-your-local-machine)
   - [Deploying on Render](#deploying-on-render)
-  - [Deploying on Heroku Cloud Platform [Deprecated]](#deploying-on-heroku-cloud-platform)
+    - [Deploy Using Blueprint](#deploy-using-blueprint)
+    - [Deploy Manually](#deploy-manually)
+    - [Final Steps](#final-steps)
+  - [Deploying on Heroku Cloud Platform [Deprecated]](#deploying-on-heroku-cloud-platform-deprecated)
 - [To-Do](#to-do)
 - [Contributing](#contributing)
 - [Credits](#credits)
@@ -88,7 +91,7 @@ Additionally, if any unauthorized person tries to access the bot's data, they wo
 
 ## Installation
 
-- First clone or download this repository as a Zip file to your local machine.
+- First fork this repository and clone it to your local machine.
 - Navigate to the directory.
 
   ```bash
@@ -221,39 +224,56 @@ If you're planning to use Render Cloud Platform, under the free plan, the bot wi
 
 
 
-If you have made any changes to the source code, commit those changes using `git add .` followed by `git commit -m "your-commit-message"` and then push those changes to your REMOTE branch on either GitHub or GitLab.
+If you have made any changes to the source code, commit those changes using `git add .` followed by `git commit -m "your-commit-message"` and then push those changes to your REMOTE branch on either GitHub or GitLab (This is a mandatory requirement).
 
-### Let's Deploy on Render!
-You can deploy your bot on Render in just a few clicks. Just click on the button below and follow the instructions.
+- ### Deploy Using Blueprint
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Dilshan-H/bla-bot)
+  If you have already pushed your changes (your data files) to the remote repository; now you can deploy your bot on Render in just a few clicks.
+  We have provided a render app [blueprint specification](https://render.com/docs/blueprint-spec) which makes the deployment process much easier. Just click on the button below and sign into your Render account.  
 
--- OR DO IT MANUALLY --
+  [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)  
 
-1. Login to your [Render account](https://dashboard.render.com/).
-2. Click on `New Service` and select **web service**.
-3. Now you can connect your GitHub or GitLab repository to Render.
+  You will have to provide the necessary values for the environment variables at first (You can refer the following table for details about the environment variables), except for `RENDER_APP_URL`.
+  Make sure to update that later. You can find environment variables section in the `Environment` tab of your web service for updating that.
 
-After this process, you have to configure the environment variables as mentioned above. You can find environment variables section in the `Environment` tab of your web service.
+- ### Deploy Manually
 
-Add these keys and respective values to the environment variables:
+  1. Login to your [Render account](https://dashboard.render.com/).
+  2. Click on `New Service` and select **web service**.
+  3. Now you can connect your GitHub or GitLab repository to Render.
+
+    After this process, you have to configure the environment variables as mentioned above. You can find environment variables section in the `Environment` tab of your web service.
+
+    Add these keys and respective values to the environment variables:
 
 | Key            | Value                                                                                                                                                                    |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | DEV_CHAT_ID    | Your chat id obtained from _idbot_                                                                                                                                       |
 | ENV            | `prod`                                                                                                                                                                   |
 | GROUP_CHAT_ID  | Your group chat id obtained from _idbot_                                                                                                                                 |
-| RENDER_APP_URL | The url of the Render app. (Ex: `https://my-bot-name.onrender.com`) - Can obtain from [Render Dashboard]([https://dashboard.render.com/](https://dashboard.render.com/)) |
+| RENDER_APP_URL | The url of the Render app. (Ex: `https://your-bot-name.onrender.com`) - Can obtain from [Render Dashboard]([https://dashboard.render.com/](https://dashboard.render.com/)) |
 | PORT           | `8443`                                                                                                                                                                   |
 | SECRET_KEY     | Your secret key here obtained after data encryption procedure                                                                                                            |
 | TELEGRAM_TOKEN | Your Telegram token obtained from _botfather_ earlier                                                                                                                 
 
-Now click on `Save Changes` and your bot will be deployed on Render. If everything goes well, you can start using your bot right away. Open the Telegram app and search for your bot and start a conversation with it. Send `/help` to your bot to see the list of commands. Test all other features and make sure everything is working as expected.
+  Now click on `Save Changes` and your bot will be deployed on Render.  
+  
+  ### Final Steps
+
+  Now open your web browser and visit the following URL - Make sure to replace the string `{YOUR-BOT-TOKEN}` with your bot's token and the `{RENDER-URL}` with your web service URL.  
+  
+  https://api.telegram.org/bot`{YOUR-BOT-TOKEN}`/setWebhook?url=`{RENDER-URL}`
+
+  You can verify webhook information using following URL:  
+  https://api.telegram.org/bot`{YOUR-BOT-TOKEN}`/getWebhookInfo
+  
+  
+  If everything goes well, you can start using your bot right away. Open the Telegram app and search for your bot and start a conversation with it. Send `/help` to your bot to see the list of commands. Test all other features and make sure everything is working as expected.
 
 Then add your bot to your group and start using it.
 
 **NOTE**:  
-You can use BotFather to change the bot's name and profile picture. Also do not forget to add all the commands to your bot using BotFather (Edit Commands). So, users can easily browse all the commands.
+You can use [BotFather](https://t.me/botfather) to change the bot's name and profile picture. Also do not forget to add all the commands to your bot using BotFather (Edit Commands). So, users can easily browse all the commands.
 
 ## Deploying on Heroku Cloud Platform [Deprecated]
 > _Heroku Update_  
@@ -303,7 +323,7 @@ You can use BotFather to change the bot's name and profile picture. Also do not 
 
 - New Features
   - User management (Softban/Ban, Mute, Unban, etc.)
-  - Add GPA Calculator base code & modules
+  - Add/Link GPA Calculator base code & modules
 
 ## Contributing
 
