@@ -657,6 +657,9 @@ async def cancel_conversation(
     """Cancels and ends the active conversation."""
     logger.info("/cancel command issued by %s", update.effective_user.full_name)
     await update.message.reply_text("✅ OK, Your request has been cancelled")
+    logger.info(
+        "Conversation with %s has been cancelled", update.effective_user.full_name
+    )
 
     return ConversationHandler.END
 
