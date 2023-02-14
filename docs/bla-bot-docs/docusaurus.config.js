@@ -11,7 +11,7 @@ const config = {
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
-  url: 'https://github.com',
+  url: 'https://dilshan-h.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/bla-bot/',
@@ -19,7 +19,9 @@ const config = {
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: 'Dilshan-H', // Usually your GitHub org/user name.
-  projectName: 'BLA-BOT', // Usually your repo name.
+  projectName: 'bla-bot', // Usually your repo name.
+  deploymentBranch: 'master', // Branch that contains the deployed site.
+  trailingSlash: false,
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
