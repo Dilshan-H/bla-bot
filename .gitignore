@@ -170,5 +170,4 @@ DATA/*.csv
 DATA/*.txt
 
 .vscode/
-*.json
 to-do.txt

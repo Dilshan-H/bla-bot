@@ -1,0 +1,22 @@
+.features {
+  display: flex;
+  align-items: center;
+  padding: 2rem 0;
+  width: 100%;
+}
+
+.featureSvg {
+  height: 350px;
+  width: auto;
+}
+
+@media screen and (max-width: 1200px) {
+  .features {
+    flex-direction: column!important;
+  }
+
+  .featureSvg {
+    height: 250px!important;
+    width: 350px!important;
+  }
+}

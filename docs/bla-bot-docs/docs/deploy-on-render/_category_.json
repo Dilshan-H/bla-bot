@@ -1,0 +1,8 @@
+{
+  "label": "Deploying on Render",
+  "position": 7,
+  "link": {
+    "type": "generated-index",
+    "description": "Let's deploy our bot on Render!"
+  }
+}
