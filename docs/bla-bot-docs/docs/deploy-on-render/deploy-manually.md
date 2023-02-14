@@ -17,7 +17,7 @@ Add these keys and respective values to the environment variables:
 | DEV_CHAT_ID    | Your chat id obtained from _idbot_                                                                                                                                       |
 | ENV            | `prod`                                                                                                                                                                   |
 | GROUP_CHAT_ID  | Your group chat id obtained from _idbot_                                                                                                                                 |
-| RENDER_APP_URL | The url of the Render app. (Ex: `https://your-bot-name.onrender.com`) - Can obtain from [Render Dashboard]([https://dashboard.render.com/](https://dashboard.render.com/)) |
+| RENDER_APP_URL | The url of the Render app. (Ex: `https://your-bot-name.onrender.com`) - Can obtain from [Render Dashboard](https://dashboard.render.com/) |
 | PORT           | `8443`                                                                                                                                                                   |
 | SECRET_KEY     | Your secret key here obtained after data encryption procedure                                                                                                            |
 | TELEGRAM_TOKEN | Your Telegram token obtained from _botfather_ earlier                                                                                                                 
