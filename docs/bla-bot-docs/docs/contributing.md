@@ -20,13 +20,20 @@ Fork the repository, make your changes and submit a pull request. It's that much
 
 python-telegram-bot is distributed under a [LGPLv3 license](https://www.gnu.org/licenses/lgpl-3.0.html).
 
+### Graphics
+
+Cover images are from [Freepik](https://www.freepik.com/):  
+- <a href="https://www.freepik.com/free-vector/cross-platform-development-abstract-concept-illustration-cross-platform-operating-systems-compatible-software-environments-mobile-app-user-experience-code-writing_10780407.htm">Image by vectorjuice</a> on Freepik  
+- <a href="https://www.freepik.com/free-vector/global-data-security-personal-data-security-cyber-data-security-online-concept-illustration-internet-security-information-privacy-protection_12953631.htm#query=secure&position=0&from_view=search&track=sph">Image by jcomp</a> on Freepik  
+- <a href="https://www.freepik.com/free-vector/colleagues-working-together-project_9174459.htm#query=manage%20group&position=13&from_view=search&track=ais">Image by pch.vector</a> on Freepik
+
 ## License & Copyrights
 
 **The MIT License**
 
 This program is free software: you can redistribute it and/or modify it under the terms of the **MIT License**
 
-\*\* Render, Heroku, Telegram, VS Code are copyrights and/or trademarks of their respective owners.
+\*\* Render, Heroku, Telegram, VS Code and Freepik are copyrights and/or trademarks of their respective owners.
 
 ## Disclaimer
 
