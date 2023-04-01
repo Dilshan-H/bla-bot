@@ -113,7 +113,7 @@ def calculate_gpa(user_nic: str) -> str:
         )
 
     # Add disclaimer info
-    message_body += "\n\n<i>🔹Please note that these data might not reflect the finalized GPA values in some occasions.</i>"
+    message_body += "\n\n<i>🔹Please note that these data might not reflect the finalized GPA values in case of the usage of weighted average GPA.</i>"
 
     return message_body
 
