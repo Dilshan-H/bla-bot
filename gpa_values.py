@@ -42,9 +42,12 @@ def get_gpa(user_id: str, step: int) -> List[str]:
 
 
 @lru_cache(maxsize=16)
-def calculate_gpa(user_nic: str) -> str:
+def calculate_gpa(user_nic: str, admin: bool = False) -> str:
     """Construct and return reply-message body with GPA values"""
-    results = get_gpa(user_nic, 2)
+    if admin:
+        results = get_gpa(user_nic, 1)
+    else:
+        results = get_gpa(user_nic, 2)
     message_body: str = ""
     warnings: str = ""
 
@@ -128,27 +131,20 @@ def academic_status(cgpa: float) -> str:
         "Awesome!",
     ]
     greeting: str = choice(greetings)
-    spoiler: str = "<span class='tg-spoiler'>"
+    # spoiler: str = "<span class='tg-spoiler'>"
 
     if cgpa >= 3.70:
         status_msg += (
-            f"{greeting} 🎉✨ You currently have a "
-            f"{spoiler}First Class 🔥🔥\nKeep it up!</span>"
+            f"{greeting} 🎉✨ You currently have a <b>First Class</b> 🔥🔥\nKeep it up!"
         )
     elif cgpa >= 3.30:
-        status_msg += (
-            f"{greeting} 🎉✨ You currently have a "
-            f"{spoiler}Second Class Upper 🔥🔥\nKeep it up!</span>"
-        )
+        status_msg += f"{greeting} 🎉✨ You currently have a <b>Second Class Upper</b> 🔥🔥\nKeep it up!"
     elif cgpa >= 3.00:
-        status_msg += (
-            f"{greeting} 🎉✨ You currently have a "
-            f"{spoiler}Second Class Lower 🔥🔥\nKeep it up!</span>"
-        )
+        status_msg += f"{greeting} 🎉✨ You currently have a <b>Second Class Lower</b> 🔥🔥\nKeep it up!"
     elif cgpa >= 2.00:
         status_msg += (
             f"{greeting} 🎉✨ You have a "
-            f"{spoiler}pass... \nKeep it up! ✨ - You can achieve a class!</span>"
+            f"<b>pass</b>... \nKeep it up! ✨ - You can achieve a class!"
         )
     else:
         status_msg += "GPA is less than 2.0 😢 - or did I make any mistake?"
