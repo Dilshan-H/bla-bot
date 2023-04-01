@@ -20,7 +20,7 @@ fernet = Fernet(os.environ["SECRET_KEY"])
 
 
 @lru_cache(maxsize=16)
-def user_info(query: str) -> str:
+def user_info(query: str, admin: bool = False) -> str:
     """Get all users info and return the message body including requested info"""
     message_body: str = "<b>🔎 Here's what I have found:</b>\n\n"
     found_info: list = []
@@ -39,10 +39,19 @@ def user_info(query: str) -> str:
                 "😕 No matching data found!\nCan you try again with a different query?"
             )
         if len(found_info) > 1:
-            return (
-                f"😕 <b>'{query}' found in {len(found_info)} places!"
-                "</b>\nCan you narrow your search query?"
-            )
+            if admin:
+                items: str = ""
+                for item in found_info:
+                    items += item[9] + " | "
+                return (
+                    f"😕 <b>'{query}' found in {len(found_info)} places!"
+                    f"</b>\nFound: {items}"
+                )
+            else:
+                return (
+                    f"😕 <b>'{query}' found in {len(found_info)} places!"
+                    "</b>\nCan you narrow your search query?"
+                )
         for info in found_info:
             message_body += (
                 f"<b>👤 <u>About {info[9]}</u></b>"

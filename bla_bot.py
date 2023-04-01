@@ -514,6 +514,14 @@ async def gpa(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
 async def get_id(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Union[str, int]:
     """Run validation on User ID & then request NIC info."""
     if get_gpa(update.message.text, 1) != []:
+        if str(update.message.chat.id) == DEV_CHAT_ID:
+            await update.message.reply_text(
+                "--- <b>ACCESS OVERRIDE</b> ---", parse_mode=ParseMode.HTML
+            )
+            await update.message.reply_text(
+                calculate_gpa(update.message.text, True), parse_mode=ParseMode.HTML
+            )
+            return ConversationHandler.END
         await update.message.reply_text("Please enter your NIC number")
         logger.info("/gpa - Getting user's NIC")
         return USER_NIC
@@ -726,9 +734,17 @@ async def whois(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Union[Non
 async def get_user_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Return info about a user based on user's query."""
     logger.info("Received query from user: %s", update.message.text)
-    await update.message.reply_text(
-        user_info(update.message.text), parse_mode=ParseMode.HTML
-    )
+    if str(update.message.chat.id) == DEV_CHAT_ID:
+        await update.message.reply_text(
+            "--- <b>ACCESS OVERRIDE</b> ---", parse_mode=ParseMode.HTML
+        )
+        await update.message.reply_text(
+            user_info(update.message.text, True), parse_mode=ParseMode.HTML
+        )
+    else:
+        await update.message.reply_text(
+            user_info(update.message.text), parse_mode=ParseMode.HTML
+        )
 
     return ConversationHandler.END
 
