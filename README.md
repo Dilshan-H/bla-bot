@@ -2,10 +2,19 @@
 
 An open-source Telegram Bot written in Python - Tailored for universities/higher education institute groups.
 
+<!-- Shield Badges -->
+
+![GitHub license](https://img.shields.io/github/license/Dilshan-H/bla-bot?style=for-the-badge)
+![GitHub last commit](https://img.shields.io/github/last-commit/Dilshan-H/bla-bot?style=for-the-badge)
+![GitHub issues](https://img.shields.io/github/issues/Dilshan-H/bla-bot?style=for-the-badge)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/Dilshan-H/bla-bot?style=for-the-badge)
+
+![GitHub stars](https://img.shields.io/github/stars/Dilshan-H/bla-bot?style=for-the-badge)
+![GitHub forks](https://img.shields.io/github/forks/Dilshan-H/bla-bot?style=for-the-badge)
+
 ![cover](https://user-images.githubusercontent.com/77499497/189495311-d59a9733-e31b-4fd1-b625-945edaf3f7e6.png)
 
-## **UPDATE**: Since `Heroku` is no longer providing free dynos, [Render](https://render.com/) is now the recommended platform for deploying this bot.
-
+**UPDATE**: Since `Heroku` is no longer providing free dynos, [Render](https://render.com/) is now the recommended platform for deploying this bot.
 
 - [Features](#features)
 - [Supported Commands in BOT](#supported-commands-in-bot)
@@ -45,7 +54,7 @@ An open-source Telegram Bot written in Python - Tailored for universities/higher
 - **Cool features**: BLA-BOT has some cool features like GPA info, birthday wishes, announce to your group as bot, additional academic resources and much more.
 - **Easy to customize**: The bot is easy to customize and modify according to your needs.
 - **Secure**: The bot is secure and private. Users only see the data they are authorized to see. Even though any other 3rd party can add your bot to their group, they won't be able to utilize some of the bot's features. (like results, student info, etc.) Some of the features are only available to the group admins.
-Additionally, if any unauthorized person tries to access the bot's data, they won't be able to do so. The data is encrypted and only the bot can decrypt it.
+  Additionally, if any unauthorized person tries to access the bot's data, they won't be able to do so. The data is encrypted and only the bot can decrypt it.
 - **Unauthorized access alert**: The bot will alert the group admins about the unauthorized access attempts via dm (This only works if you have already interacted with your bot via dm previously).
 - **Documentation**: The bot is well documented and has a detailed README file. You can easily understand how the bot works and how to customize it according to your needs.
 
@@ -126,7 +135,7 @@ Additionally, if any unauthorized person tries to access the bot's data, they wo
   pip install -r requirements.txt
   ```
 
-  Now go ahead and configure your bot according to your needs. (See [Usage](#usage)) 
+  Now go ahead and configure your bot according to your needs. (See [Usage](#usage))
 
 - Whenever you need to properly exit from the virtual environment, just run the following command:
 
@@ -148,7 +157,7 @@ Additionally, if any unauthorized person tries to access the bot's data, they wo
   poetry shell
   ```
 
-  Now go ahead and configure your bot according to your needs. (See [Usage](#usage)) 
+  Now go ahead and configure your bot according to your needs. (See [Usage](#usage))
 
 - Whenever you need to properly exit from the shell and the virtual environment run the following command :
 
@@ -161,13 +170,16 @@ Additionally, if any unauthorized person tries to access the bot's data, they wo
 1. Make sure to install the dependencies using above steps first.
 
 2. Configure the `BOT INFO`, `TIMEZONE DATA` and `UNIVERSITY INFO` in `bla_bot.py`.
-    - To choose the correct time zone for `TIME_ZONE`, you can query all the supported time zones like this (run this in a separate terminal):
 
-      ```bash
-      python3 -c "import pytz; print(pytz.all_timezones)"
-      ```
-      Type the name of the time zone you want to use in `TIME_ZONE` variable.
-    - Replace university name, short name, and other info in `UNIVERSITY_INFO` section.
+   - To choose the correct time zone for `TIME_ZONE`, you can query all the supported time zones like this (run this in a separate terminal):
+
+     ```bash
+     python3 -c "import pytz; print(pytz.all_timezones)"
+     ```
+
+     Type the name of the time zone you want to use in `TIME_ZONE` variable.
+
+   - Replace university name, short name, and other info in `UNIVERSITY_INFO` section.
 
 3. The data files (inside `/DATA` directory) must be filled and formatted as requested, before encrypting. Then run `encrypt_data.py` file (inside `/DATA` directory) to properly encrypt all the data. ([Read More](/DATA/README.md#data-formatting--encrypting))
 4. Obtain a telegram bot token from [BotFather](https://t.me/BotFather) (This will be needed as we proceed further.). Start a conversation with BotFather on Telegram and follow the instructions to create a new bot. You will receive a token that you can use to authorize your bot and send requests to the Bot API.
@@ -177,41 +189,44 @@ Additionally, if any unauthorized person tries to access the bot's data, they wo
 
 **NOTE**: Following environment variables are used to configure the bot in `PRODUCTION/LOCAL ENVIRONMENT`.
 
-   - `TELEGRAM_TOKEN` -> Telegram bot token.
-   - `DEV_CHAT_ID` -> The chat id of the developer where the bot will send debug messages.
-   - `GROUP_CHAT_ID` -> The chat id of your group.
-   - `SECRET_KEY` -> The secret key for the file decryption process (You can find your key inside `DATA` directory).  
+- `TELEGRAM_TOKEN` -> Telegram bot token.
+- `DEV_CHAT_ID` -> The chat id of the developer where the bot will send debug messages.
+- `GROUP_CHAT_ID` -> The chat id of your group.
+- `SECRET_KEY` -> The secret key for the file decryption process (You can find your key inside `DATA` directory).
 
 1. You can set these environment variables in your terminal using the following commands:
 
-    ```bash
-    export DEV_CHAT_ID=use_your_chat_id_here_obtained_from_idbot
-    export TELEGRAM_TOKEN=use_your_telegram_token_obtained_from_botfather_earlier
-    export SECRET_KEY=use_your_secret_key_here_obtained_from_encrypting_data
-    export GROUP_CHAT_ID=use_your_group_chat_id_here_obtained_from_idbot
+   ```bash
+   export DEV_CHAT_ID=use_your_chat_id_here_obtained_from_idbot
+   export TELEGRAM_TOKEN=use_your_telegram_token_obtained_from_botfather_earlier
+   export SECRET_KEY=use_your_secret_key_here_obtained_from_encrypting_data
+   export GROUP_CHAT_ID=use_your_group_chat_id_here_obtained_from_idbot
 
-    ```
+   ```
+
 2. Run the bot using the following command:
 
-    On Linux:
+   On Linux:
 
-    ```bash
-    python3 bla_bot.py
-    ```
-    On Windows:
+   ```bash
+   python3 bla_bot.py
+   ```
 
-    ```bash
-    py bla_bot.py
-    ```
-    On Linux using Poetry:
+   On Windows:
 
-    ```bash
-    poetry run python3 bla_bot.py
-    ```
+   ```bash
+   py bla_bot.py
+   ```
 
-    Cool! Now you can start using your bot.  
-    Open the Telegram app and search for your bot and start a conversation with it.
-    Send `/help` to your bot to see the list of commands. Test all other features and make sure everything is working as expected.
+   On Linux using Poetry:
+
+   ```bash
+   poetry run python3 bla_bot.py
+   ```
+
+   Cool! Now you can start using your bot.  
+   Open the Telegram app and search for your bot and start a conversation with it.
+   Send `/help` to your bot to see the list of commands. Test all other features and make sure everything is working as expected.
 
 3. Press `Ctrl-C` on the command line to stop the bot.
 
@@ -222,16 +237,14 @@ Additionally, if any unauthorized person tries to access the bot's data, they wo
 **NOTE**:
 If you're planning to use Render Cloud Platform, under the free plan, the bot will be automatically stopped after some time of inactivity (~15 minutes). As a work-around, you can use a service like [Cron-Job.ORG](https://cron-job.org/) (Totally Free) to keep the bot alive in certain times.
 
-
-
 If you have made any changes to the source code, commit those changes using `git add .` followed by `git commit -m "your-commit-message"` and then push those changes to your REMOTE branch on either GitHub or GitLab (This is a mandatory requirement).
 
 - ### Deploy Using Blueprint
 
   If you have already pushed your changes (your data files) to the remote repository; now you can deploy your bot on Render in just a few clicks.
-  We have provided a render app [blueprint specification](https://render.com/docs/blueprint-spec) which makes the deployment process much easier. Just click on the button below and sign into your Render account.  
+  We have provided a render app [blueprint specification](https://render.com/docs/blueprint-spec) which makes the deployment process much easier. Just click on the button below and sign into your Render account.
 
-  [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)  
+  [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
 
   You will have to provide the necessary values for the environment variables at first (You can refer the following table for details about the environment variables), except for `RENDER_APP_URL`.
   Make sure to update that later. You can find environment variables section in the `Environment` tab of your web service for updating that.
@@ -242,33 +255,32 @@ If you have made any changes to the source code, commit those changes using `gi
   2. Click on `New Service` and select **web service**.
   3. Now you can connect your GitHub or GitLab repository to Render.
 
-    After this process, you have to configure the environment variables as mentioned above. You can find environment variables section in the `Environment` tab of your web service.
+  After this process, you have to configure the environment variables as mentioned above. You can find environment variables section in the `Environment` tab of your web service.
 
-    Add these keys and respective values to the environment variables:
+  Add these keys and respective values to the environment variables:
 
-| Key            | Value                                                                                                                                                                    |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| DEV_CHAT_ID    | Your chat id obtained from _idbot_                                                                                                                                       |
-| ENV            | `prod`                                                                                                                                                                   |
-| GROUP_CHAT_ID  | Your group chat id obtained from _idbot_                                                                                                                                 |
-| RENDER_APP_URL | The url of the Render app. (Ex: `https://your-bot-name.onrender.com`) - Can obtain from [Render Dashboard]([https://dashboard.render.com/](https://dashboard.render.com/)) |
-| PORT           | `8443`                                                                                                                                                                   |
-| SECRET_KEY     | Your secret key here obtained after data encryption procedure                                                                                                            |
-| TELEGRAM_TOKEN | Your Telegram token obtained from _botfather_ earlier                                                                                                                 
+| Key            | Value                                                                                                                                                                        |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DEV_CHAT_ID    | Your chat id obtained from _idbot_                                                                                                                                           |
+| ENV            | `prod`                                                                                                                                                                       |
+| GROUP_CHAT_ID  | Your group chat id obtained from _idbot_                                                                                                                                     |
+| RENDER_APP_URL | The url of the Render app. (Ex: `https://your-bot-name.onrender.com`) - Can obtain from [Render Dashboard](<[https://dashboard.render.com/](https://dashboard.render.com/)>) |
+| PORT           | `8443`                                                                                                                                                                       |
+| SECRET_KEY     | Your secret key here obtained after data encryption procedure                                                                                                                |
+| TELEGRAM_TOKEN | Your Telegram token obtained from _botfather_ earlier                                                                                                                        |
 
-  Now click on `Save Changes` and your bot will be deployed on Render.  
-  
-  ### Final Steps
+Now click on `Save Changes` and your bot will be deployed on Render.
 
-  Now open your web browser and visit the following URL - Make sure to replace the string `{YOUR-BOT-TOKEN}` with your bot's token and the `{RENDER-URL}` with your web service URL.  
-  
-  https://api.telegram.org/bot{YOUR-BOT-TOKEN}/setWebhook?url={RENDER-URL}
+### Final Steps
 
-  You can verify webhook information using following URL:  
-  https://api.telegram.org/bot{YOUR-BOT-TOKEN}/getWebhookInfo
-  
-  
-  If everything goes well, you can start using your bot right away. Open the Telegram app and search for your bot and start a conversation with it. Send `/help` to your bot to see the list of commands. Test all other features and make sure everything is working as expected.
+Now open your web browser and visit the following URL - Make sure to replace the string `{YOUR-BOT-TOKEN}` with your bot's token and the `{RENDER-URL}` with your web service URL.
+
+https://api.telegram.org/bot{YOUR-BOT-TOKEN}/setWebhook?url={RENDER-URL}
+
+You can verify webhook information using following URL:  
+ https://api.telegram.org/bot{YOUR-BOT-TOKEN}/getWebhookInfo
+
+If everything goes well, you can start using your bot right away. Open the Telegram app and search for your bot and start a conversation with it. Send `/help` to your bot to see the list of commands. Test all other features and make sure everything is working as expected.
 
 Then add your bot to your group and start using it.
 
@@ -276,48 +288,49 @@ Then add your bot to your group and start using it.
 You can use [BotFather](https://t.me/botfather) to change the bot's name and profile picture. Also do not forget to add all the commands to your bot using BotFather (Edit Commands). So, users can easily browse all the commands.
 
 ## Deploying on Heroku Cloud Platform [Deprecated]
+
 > _Heroku Update_  
 > Starting November 28th, 2022, free Heroku Dynos, free Heroku Postgres, and free Heroku Data for Redis® will no longer be available.
 
 <details>
   <summary>Steps to configure on Heroku</summary>
 
-  **NOTE**:
-  If you're planning to use Heroku Cloud Platform, under the free plan, the bot will be automatically stopped after some time of inactivity. As a work-around, you can use a service like [Cron-Job.ORG](https://cron-job.org/) (Totally Free) to keep the bot alive in certain times.
+**NOTE**:
+If you're planning to use Heroku Cloud Platform, under the free plan, the bot will be automatically stopped after some time of inactivity. As a work-around, you can use a service like [Cron-Job.ORG](https://cron-job.org/) (Totally Free) to keep the bot alive in certain times.
 
-  If you have made any changes to the source code, commit those changes using `git add .` followed by `git commit -m "commit-message"`
+If you have made any changes to the source code, commit those changes using `git add .` followed by `git commit -m "commit-message"`
 
-  If you're willing to use Heroku cloud platform, here's how to do that: (A Heroku account, Heroku CLI and Git will be needed - Read [Basic Requirements](#basic-requirements))
+If you're willing to use Heroku cloud platform, here's how to do that: (A Heroku account, Heroku CLI and Git will be needed - Read [Basic Requirements](#basic-requirements))
 
-  1. Login to Heroku.
-      ```bash
-      heroku login
-      ```
-  2. Create a heroku app.
+1.  Login to Heroku.
+    ```bash
+    heroku login
+    ```
+2.  Create a heroku app.
 
-      ```bash
-      heroku create YOUR-APP-NAME
-      ```
+    ```bash
+    heroku create YOUR-APP-NAME
+    ```
 
-  3. Next deploy the app:
+3.  Next deploy the app:
 
-      ```bash
-      git push heroku main
-      ```
+    ```bash
+    git push heroku main
+    ```
 
-  4. Now set the environment variables (You can also set them on your Heroku dashboard):
+4.  Now set the environment variables (You can also set them on your Heroku dashboard):
 
-      ```bash
-        heroku config:set TELEGRAM_TOKEN=YOUR-TELEGRAM-TOKEN
-        heroku config:set DEV_CHAT_ID=YOUR-DEV-CHAT-ID
-        heroku config:set GROUP_CHAT_ID=YOUR-GROUP-CHAT-ID
-        heroku config:set SECRET_KEY=YOUR-SECRET-KEY
-        heroku config:set PORT=8443
-        heroku config:set HEROKU_APP_URL=YOUR-HEROKU-APP-URL
-        heroku config:set ENV=prod
-      ```
-</details>
+          ```bash
+            heroku config:set TELEGRAM_TOKEN=YOUR-TELEGRAM-TOKEN
+            heroku config:set DEV_CHAT_ID=YOUR-DEV-CHAT-ID
+            heroku config:set GROUP_CHAT_ID=YOUR-GROUP-CHAT-ID
+            heroku config:set SECRET_KEY=YOUR-SECRET-KEY
+            heroku config:set PORT=8443
+            heroku config:set HEROKU_APP_URL=YOUR-HEROKU-APP-URL
+            heroku config:set ENV=prod
+          ```
 
+    </details>
 
 ## To-Do
 

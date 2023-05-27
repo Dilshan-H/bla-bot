@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=unused-argument, wrong-import-position
+# pylint: disable=unused-argument, wrong-import-position, import-error
 # Built using python-telegram-bot v20.0a2 and its dependencies.
 # Special thanks to python-telegram-bot v20.0a2 example scripts.
 
