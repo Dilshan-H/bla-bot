@@ -17,6 +17,7 @@ An open-source Telegram Bot written in Python - Tailored for universities/higher
 **UPDATE**: Since `Heroku` is no longer providing free dynos, [Render](https://render.com/) is now the recommended platform for deploying this bot.
 
 - [Features](#features)
+- [Screenshots](#screenshots)
 - [Supported Commands in BOT](#supported-commands-in-bot)
   - [Basic Commands](#basic-commands)
   - [Academic Related Commands](#academic-related-commands)
@@ -47,6 +48,12 @@ An open-source Telegram Bot written in Python - Tailored for universities/higher
 - Intelligent search & indexing
 - Logging enabled
 - Secure & Private
+
+## Screenshots
+
+| ![ Telegram_Bot_Image_1 ](https://github.com/Dilshan-H/bla-bot/assets/77499497/e3a80a75-c833-4b0f-a269-cff7c931b8e7) | ![ Telegram_Bot_Image_2 ](https://github.com/Dilshan-H/bla-bot/assets/77499497/5cbe13c6-08e9-4ffa-821f-2774a02430b4) |
+| -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| ![ Telegram_Bot_Image_3 ](https://github.com/Dilshan-H/bla-bot/assets/77499497/e9085a69-447e-467e-adfd-b67e82de6894) | ![ Telegram_Bot_Image_4 ](https://github.com/Dilshan-H/bla-bot/assets/77499497/aefa3956-e578-481b-acd0-f4ce53a44242) |
 
 ## Why use **BLA-BOT** in your academic group?
 
