@@ -21,6 +21,6 @@ setuptools==65.5.1
 six==1.16.0 
 sniffio==1.2.0 
 thefuzz[speedup]==0.19.0 
-tornado==6.3.3 
+tornado==6.2 
 tzdata==2022.2 
 tzlocal==4.2 
