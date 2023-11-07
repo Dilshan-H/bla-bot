@@ -8,7 +8,7 @@ authors = ["dilshan-h <77499497+Dilshan-H@users.noreply.github.com>"]
 python = "^3.8"
 python-telegram-bot = {version = "20.0a2", allow-prereleases = true}
 pytz = "^2022.2.1"
-cryptography = "^41.0.0"
+cryptography = "^41.0.4"
 thefuzz = {extras = ["speedup"], version = "^0.19.0"}
 
 [tool.poetry.dev-dependencies]

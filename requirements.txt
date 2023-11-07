@@ -2,9 +2,9 @@ anyio==3.6.1
 apscheduler==3.9.1 
 backports-zoneinfo==0.2.1 
 cachetools==5.2.0 
-certifi==2022.12.7 
+certifi==2023.7.22 
 cffi==1.15.1 
-cryptography==37.0.4 
+cryptography==41.0.2 
 h11==0.12.0 
 httpcore==0.15.0 
 httpx==0.23.0 
