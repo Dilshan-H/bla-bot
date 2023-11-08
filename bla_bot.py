@@ -63,7 +63,7 @@ from telegram.ext import (
     ConversationHandler,
 )
 
-from gpa_values import calculate_gpa, get_gpa
+from gpa_values import calculate_gpa, get_gpa, get_leaderboard
 from staff_info import employee_info
 from about_user import user_info
 from manage_bdays import generate_wish
@@ -84,7 +84,7 @@ logger = logging.getLogger(__name__)
 ENV: str = os.environ.get("ENV", "dev")
 
 # BOT INFO
-BOT_VERSION: str = "1.1.2-beta"
+BOT_VERSION: str = "1.2.0"
 BOT_NAME: str = "BLA BOT"
 BOT_DESCRIPTION: str = """Born on: 2022.08.20 in Sri Lanka.\n
 And, Hey, I'm an open-source bot written in Python.
@@ -511,6 +511,47 @@ async def gpa(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     return USER_ID
 
 
+async def leaderboard(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Show GPA leaderboard when the command /leaderboard is issued."""
+    logger.info(
+        "/leaderboard command issued by %s",
+        update.effective_user.full_name,
+    )
+
+    if not is_authenticated_origin(update):
+        logger.warning(
+            "Unauthorized user - %s tried to use command /leaderboard",
+            update.effective_user.full_name,
+        )
+        await update.message.reply_text(
+            "⛔ Request Rejected! - This command requires elevated privileges.\n"
+            "❓ Reason: Originated from unrecognized chat id.\n\n"
+            "Please visit https://github.com/dilshan-h/bla-bot to make your own bot."
+        )
+        await alert_dev(
+            f"An attempt was made to use <b>/leaderboard</b> command by an unauthorized user.\n\n"
+            f"<b><u>Chat Info</u></b>\n"
+            f"<b>Chat Title</b>: {update.effective_chat.title}\n"
+            f"<b>Chat ID</b>: {update.effective_chat.id}\n"
+            f"<b>Chat Type</b>: {update.effective_chat.type}\n"
+            f"\n"
+            f"<b><u>User Info</u></b>\n"
+            f"<b>User ID</b>: {update.effective_user.id}\n"
+            f"<b>Username</b>: @{update.effective_user.username}\n"
+            f"<b>First Name</b>: {update.effective_user.first_name}\n"
+            f"<b>Last Name</b>: {update.effective_user.last_name}\n"
+            f"<b>Language Code</b>: {update.effective_user.language_code}\n",
+            3,
+            context,
+        )
+        return
+
+    await update.message.reply_text(
+        get_leaderboard(),
+        parse_mode=ParseMode.HTML,
+    )
+
+
 async def get_id(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Union[str, int]:
     """Run validation on User ID & then request NIC info."""
     if get_gpa(update.message.text, 1) != []:
@@ -845,6 +886,10 @@ def main() -> None:
     application.add_handler(gpa_conv_handler)
     logger.info("GPA Info conversation handler added")
 
+    # Handle '/leaderboard' command.
+    application.add_handler(CommandHandler("leaderboard", leaderboard))
+    logger.info("Leaderboard handler added")
+
     # Handle conversation - Staff Info
     staff_conv_handler = ConversationHandler(
         entry_points=[CommandHandler("staff", staff)],
@@ -919,7 +964,7 @@ def main() -> None:
         # To reset this, simply pass `allowed_updates=[]`
         application.run_polling(allowed_updates=Update.ALL_TYPES)
     else:
-        # On Heroku - Production Environment
+        # On Render - Production Environment
         application.run_webhook(
             listen="0.0.0.0",
             port=PORT,
