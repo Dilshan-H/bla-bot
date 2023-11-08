@@ -1,3 +1,5 @@
+# pylint: disable=line-too-long
+
 """
 Get GPA values from results.csv for all users and filter according to the request
 
@@ -54,16 +56,16 @@ def calculate_gpa(user_nic: str, admin: bool = False) -> str:
     if results == []:
         return "Invalid NIC detected! - Sorry, You are not authorized to continue..."
 
-    if results[10] == "ERROR":
+    if results[11] == "ERROR":
         return (
             "I can't validate your NIC because it's not registered in database.\n"
             "Please mention/ping admin to update your NIC"
         )
-    elif results[10] == "HOLD":
+    elif results[11] == "HOLD":
         warnings += (
             "🔵 Your results are on hold. Partially calculated GPA values are shown.\n\n"
         )
-    elif results[10] == "NEW":
+    elif results[11] == "NEW":
         warnings += (
             "🔵 Since calculated GPA values are based on your current results within this batch;"
             "OGPA, CGPA and Academic Status will not represent accurate information.\n\n"
@@ -72,7 +74,7 @@ def calculate_gpa(user_nic: str, admin: bool = False) -> str:
     # Semester GPAs
     count: int = 1
     message_body += "<b><u>Semester GPA</u></b>\n\n"
-    for item in results[2:10]:
+    for item in results[3:11]:
         if item in ["", "\n"]:
             count += 1
             continue
@@ -92,7 +94,7 @@ def calculate_gpa(user_nic: str, admin: bool = False) -> str:
     # Level GPAs
     count = 1
     message_body += "<b><u>Level GPA</u></b>\n\n"
-    for item in results[11:15]:
+    for item in results[12:16]:
         if item in ["", "\n"]:
             count += 1
             continue
@@ -101,8 +103,8 @@ def calculate_gpa(user_nic: str, admin: bool = False) -> str:
     message_body += "\n"
 
     # Current GPA
-    cgpa: float = round(float(results[15]), 2)
-    message_body += f"🔹Your Current GPA is <b>{cgpa}</b>\n\n"
+    cgpa: float = round(float(results[16]), 2)
+    message_body += f"🔹Your Cumulative GPA is <b>{cgpa}</b>\n\n"
 
     # Academic Status
     message_body += academic_status(cgpa)
@@ -116,7 +118,37 @@ def calculate_gpa(user_nic: str, admin: bool = False) -> str:
         )
 
     # Add disclaimer info
-    message_body += "\n\n<i>🔹Please note that these data might not reflect the finalized GPA values in case of the usage of weighted average GPA.</i>"
+    message_body += (
+        "\n\n<i>🔹Please note that these data might not reflect the finalized GPA values in case of the usage of weighted average GPA.</i>\n\n"
+        "🔹<b>MDP & Environment Planning Design</b> modules yet to be added."
+    )
+
+    return message_body
+
+
+def get_leaderboard() -> str:
+    """Construct and return reply-message body with leaderboard"""
+    with open(file=data_path, mode="rb") as data_file:
+        stream = data_file.read()
+        decrypted_data = fernet.decrypt(stream).decode().strip().split("\n")
+        reader = csv.reader(decrypted_data)
+        data: List[List[str]] = []
+        for row in reader:
+            data.append(row)
+
+    # Sort data by CGPA
+    # print(data)
+    # data[1:].sort(key=lambda x: float(x[16]), reverse=True)
+    sorted_data = sorted(data[1:], key=lambda x: float(x[16]), reverse=True)
+
+    # Construct message body
+    message_body: str = "<b><u>Leaderboard [Cumulative GPA]</u></b>\n\n"
+    count: int = 1
+    for row in sorted_data[:10]:
+        if row[16] == "":
+            continue
+        message_body += f"{count}. <b>{row[2]}</b> 🔸 {row[16]}\n\n"
+        count += 1
 
     return message_body
 
