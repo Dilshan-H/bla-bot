@@ -31,6 +31,7 @@ import os
 from typing import Optional, Tuple, Union, List
 from html import escape
 from datetime import time
+from dotenv import load_dotenv
 import pytz
 
 from telegram import __version__ as TG_VER
@@ -80,11 +81,13 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+load_dotenv()
+
 # Environment
 ENV: str = os.environ.get("ENV", "dev")
 
 # BOT INFO
-BOT_VERSION: str = "1.2.0"
+BOT_VERSION: str = "1.2.1"
 BOT_NAME: str = "BLA BOT"
 BOT_DESCRIPTION: str = """Born on: 2022.08.20 in Sri Lanka.\n
 And, Hey, I'm an open-source bot written in Python.
