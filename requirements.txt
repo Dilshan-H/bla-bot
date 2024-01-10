@@ -10,7 +10,7 @@ httpx==0.23.0
 idna==3.3
 Levenshtein==0.20.7
 pycparser==2.21
-python-dotenv==1.0.0
+python-dotenv
 python-Levenshtein==0.20.7
 python-telegram-bot==20.0a2
 pytz==2022.2.1
