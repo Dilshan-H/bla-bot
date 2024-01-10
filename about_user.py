@@ -1,3 +1,5 @@
+# pylint: disable=import-error
+
 """
 Show information about a specific user based on the user's query
 
@@ -12,7 +14,10 @@ from functools import lru_cache
 import os
 import csv
 from cryptography.fernet import Fernet
+from dotenv import load_dotenv
 from thefuzz import fuzz
+
+load_dotenv()
 
 BASE_DIR: str = os.path.dirname(os.path.abspath(__file__))
 data_path: str = os.path.join(BASE_DIR, "DATA", "full_batch_data.csv.crypt")

@@ -1,3 +1,5 @@
+# pylint: disable=import-error
+
 """
 Provide information about an specific employee based on the user's query
 
@@ -10,7 +12,10 @@ Author: @dilshan-h (https://github.com/dilshan-h)
 import os
 from functools import lru_cache
 from cryptography.fernet import Fernet
+from dotenv import load_dotenv
 from thefuzz import fuzz
+
+load_dotenv()
 
 BASE_DIR: str = os.path.dirname(os.path.abspath(__file__))
 data_path: str = os.path.join(BASE_DIR, "DATA", "staff_info.txt.crypt")

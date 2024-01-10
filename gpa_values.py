@@ -1,4 +1,4 @@
-# pylint: disable=line-too-long
+# pylint: disable=line-too-long import-error
 
 """
 Get GPA values from results.csv for all users and filter according to the request
@@ -17,8 +17,10 @@ from typing import List
 import csv
 from random import choice
 from functools import lru_cache
+from dotenv import load_dotenv
 from cryptography.fernet import Fernet
 
+load_dotenv()
 
 BASE_DIR: str = os.path.dirname(os.path.abspath(__file__))
 data_path: str = os.path.join(BASE_DIR, "DATA", "results.csv.crypt")
@@ -61,10 +63,8 @@ def calculate_gpa(user_nic: str, admin: bool = False) -> str:
             "I can't validate your NIC because it's not registered in database.\n"
             "Please mention/ping admin to update your NIC"
         )
-    elif results[11] == "HOLD":
-        warnings += (
-            "🔵 Your results are on hold. Partially calculated GPA values are shown.\n\n"
-        )
+    if results[11] == "HOLD":
+        warnings += "🔵 Your final results are on hold. Partially calculated GPA values are shown.\n\n"
     elif results[11] == "NEW":
         warnings += (
             "🔵 Since calculated GPA values are based on your current results within this batch;"
@@ -118,11 +118,7 @@ def calculate_gpa(user_nic: str, admin: bool = False) -> str:
         )
 
     # Add disclaimer info
-    message_body += (
-        "\n\n<i>🔹Please note that these data might not reflect the finalized GPA values in case of the usage of weighted average GPA.</i>\n\n"
-        "🔹<b>MDP & Environment Planning Design</b> modules yet to be added."
-    )
-
+    message_body += "\n\n<i>🔹Please note that these data might not reflect the finalized GPA values in case of the usage of weighted average GPA.</i>\n\n"
     return message_body
 
 

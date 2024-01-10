@@ -1,3 +1,5 @@
+# pylint: disable=import-error
+
 """
 Provide information about various resources based on the user's query
 
@@ -11,7 +13,10 @@ import os
 import csv
 from functools import lru_cache
 from cryptography.fernet import Fernet
+from dotenv import load_dotenv
 from thefuzz import fuzz
+
+load_dotenv()
 
 BASE_DIR: str = os.path.dirname(os.path.abspath(__file__))
 data_path: str = os.path.join(BASE_DIR, "DATA", "resources.csv.crypt")

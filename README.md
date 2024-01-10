@@ -194,22 +194,24 @@ An open-source Telegram Bot written in Python - Tailored for universities/higher
 
 ## Testing on your Local Machine
 
-**NOTE**: Following environment variables are used to configure the bot in `PRODUCTION/LOCAL ENVIRONMENT`.
+**NOTE**: Following environment variables are used to configure the bot in `LOCAL ENVIRONMENT`.
 
 - `TELEGRAM_TOKEN` -> Telegram bot token.
 - `DEV_CHAT_ID` -> The chat id of the developer where the bot will send debug messages.
 - `GROUP_CHAT_ID` -> The chat id of your group.
 - `SECRET_KEY` -> The secret key for the file decryption process (You can find your key inside `DATA` directory).
 
-1. You can set these environment variables in your terminal using the following commands:
+1. Create a `.env` file in the root directory of the project and add the following environment variables to it:
 
-   ```bash
-   export DEV_CHAT_ID=use_your_chat_id_here_obtained_from_idbot
-   export TELEGRAM_TOKEN=use_your_telegram_token_obtained_from_botfather_earlier
-   export SECRET_KEY=use_your_secret_key_here_obtained_from_encrypting_data
-   export GROUP_CHAT_ID=use_your_group_chat_id_here_obtained_from_idbot
-
-   ```
+```bash
+DEV_CHAT_ID=use_your_chat_id_here_obtained_from_idbot
+ENV=dev # Use 'prod' for production environment
+GROUP_CHAT_ID=use_your_group_chat_id_here_obtained_from_idbot
+PORT=8443
+RENDER_APP_URL=use_your_render_app_url_here_obtained_from_render_dashboard # Keep this empty if you're running the bot locally
+SECRET_KEY=use_your_secret_key_here_obtained_from_encrypting_data
+TELEGRAM_TOKEN=use_your_telegram_token_obtained_from_botfather_earlier
+```
 
 2. Run the bot using the following command:
 

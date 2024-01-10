@@ -1,3 +1,5 @@
+# pylint: disable=import-error
+
 """
 Get birthdays for a specific date from a CSV file and return wishes for each user with a random text
 
@@ -12,8 +14,11 @@ from typing import List
 import csv
 from datetime import datetime
 from random import choice
+from dotenv import load_dotenv
 import pytz
 from cryptography.fernet import Fernet
+
+load_dotenv()
 
 BASE_DIR: str = os.path.dirname(os.path.abspath(__file__))
 data_path: str = os.path.join(BASE_DIR, "DATA", "full_batch_data.csv.crypt")
