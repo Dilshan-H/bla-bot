@@ -2,6 +2,8 @@
 
 An open-source Telegram Bot written in Python - Tailored for universities/higher education institute groups.
 
+🔴 This is `v1 branch` - Ready to be deployed on **Render** platform. Due to certain restrictions, we have to move away from it. This branch will **not** be updated in future! Please consider using `master` branch instead.
+
 <!-- Shield Badges -->
 
 ![GitHub license](https://img.shields.io/github/license/Dilshan-H/bla-bot?style=for-the-badge)
@@ -13,8 +15,6 @@ An open-source Telegram Bot written in Python - Tailored for universities/higher
 ![GitHub forks](https://img.shields.io/github/forks/Dilshan-H/bla-bot?style=for-the-badge)
 
 ![cover](https://user-images.githubusercontent.com/77499497/189495311-d59a9733-e31b-4fd1-b625-945edaf3f7e6.png)
-
-**UPDATE**: Since `Heroku` is no longer providing free dynos, [Render](https://render.com/) is now the recommended platform for deploying this bot.
 
 - [Features](#features)
 - [Screenshots](#screenshots)
